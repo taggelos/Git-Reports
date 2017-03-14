@@ -13,7 +13,7 @@ public class TestMain {
 
         //FileReader fr = new FileReader();
         //getList lists = new getList();
-
+    	
         if (args[0] == null || args[0].trim().isEmpty() || args[1] == null || args[1].trim().isEmpty()) {
             System.out.println("You need to specify a path!");
             return;
@@ -44,14 +44,17 @@ public class TestMain {
             String domainName = "google.com";
 
             //in mac oxs
-            String command = "git ls-files ";
+            String command = "cmd /C git ls-files | find /c /v \"\"";
 
             //in windows
             //String command = "ping -n 3 " + domainName;
-
+            
+        	//System.getProperty("os.name").toLowerCase().startsWith("windows");
             String output = obj.executeCommand(command, args[0]);
+            
+            //System.out.println(System.getProperty("user.dir"));
 
-            System.out.println(output);
+            System.out.println("res > " +  output);
 
 
             //System.out.println(countFiles(args[0]));
@@ -77,13 +80,17 @@ public class TestMain {
 
         Process p;
         try {
+        	System.out.println("wqqwwq");
             p = Runtime.getRuntime().exec(command, null, new File(arg));
+            System.out.println("ssadd");
             p.waitFor();
+            System.out.println(p.exitValue());
             BufferedReader reader =
                     new BufferedReader(new InputStreamReader(p.getInputStream()));
 
             String line;
             int counter=0;
+            
             while ((line = reader.readLine()) != null) {
                 output.append(line+'\n');
             	counter++;
