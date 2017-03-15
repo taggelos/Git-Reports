@@ -91,10 +91,10 @@ public class TestMain {
             
             
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-            //command = "git log";
-            //output = obj.executeCommand(command, args[0]);
-            //System.out.println("Number of total commits is: \n" +  output);
-            
+            command = "cmd /C  git log | findstr Author: | sort | wc -l";
+            output = obj.executeCommand(command, args[0]);
+            System.out.println("Number of total commits is: \n" +  output);
+            bw.write("<tr><th>Number of total commits</th><th colspan=\"2\">"+ output+ "</th></tr>");
             
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
             
@@ -137,7 +137,7 @@ public class TestMain {
             	//counter++;
             }
             //System.out.println(counter);
-
+            p.destroy();
         } catch (Exception e) {
             e.printStackTrace();
         }
