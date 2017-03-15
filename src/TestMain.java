@@ -41,23 +41,54 @@ public class TestMain {
 
             TestMain obj = new TestMain();
 
-            String domainName = "google.com";
+            //String domainName = "google.com";
 
             //in mac oxs
-            String command = "cmd /C git ls-files | find /c /v \"\"";
+            String command;
+            String output;
+            
+            command = "cmd /C git ls-files | wc -l";
 
             //in windows
             //String command = "ping -n 3 " + domainName;
             
         	//System.getProperty("os.name").toLowerCase().startsWith("windows");
-            String output = obj.executeCommand(command, args[0]);
+            output = obj.executeCommand(command, args[0]);
             
             //System.out.println(System.getProperty("user.dir"));
 
-            System.out.println("res > " +  output);
+            System.out.println("Number of files is: \n" +  output);
 
-
+            //command = "git diff --stat 4b825dc642cb6eb9a060e54bf8d69288fbee4904";
+            //command = "cmd /C git ls-files | xargs wc /l";
+            //output = obj.executeCommand(command, args[0]);
+            //System.out.println("Number of total lines is: " +  output);
+            
+            /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+            command = "cmd /C git branch -ar | find /c /v \"\"";
+            output = obj.executeCommand(command, args[0]);
+            System.out.println("Number of total branches is: \n" +  output);
+            
+            /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+            command = "cmd /C git tag | find /c /v \"\"";
+            output = obj.executeCommand(command, args[0]);
+            System.out.println("Number of total tags is: \n" +  output);
+            
+            /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+            command = "cmd /C  git log | findstr Author: | sort | uniq | wc -l";
+            output = obj.executeCommand(command, args[0]);
+            System.out.println("Number of total committers is: \n" +  output);
+            
+            /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+            //command = "git log";
+            //output = obj.executeCommand(command, args[0]);
+            //System.out.println("Number of total commits is: \n" +  output);
+            
+            
+            /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+            
             //System.out.println(countFiles(args[0]));
+            System.out.println("\nOLA GOOD (oxi)");
 
 
             bw.write("</text" + "area>");
@@ -80,22 +111,22 @@ public class TestMain {
 
         Process p;
         try {
-        	System.out.println("wqqwwq");
+        	//System.out.println("wqqwwq");
             p = Runtime.getRuntime().exec(command, null, new File(arg));
-            System.out.println("ssadd");
+            //System.out.println(p.exitValue());
             p.waitFor();
-            System.out.println(p.exitValue());
+            //System.out.println(p.exitValue());
             BufferedReader reader =
                     new BufferedReader(new InputStreamReader(p.getInputStream()));
 
             String line;
-            int counter=0;
+            //int counter=0;
             
             while ((line = reader.readLine()) != null) {
                 output.append(line+'\n');
-            	counter++;
+            	//counter++;
             }
-            System.out.println(counter);
+            //System.out.println(counter);
 
         } catch (Exception e) {
             e.printStackTrace();
