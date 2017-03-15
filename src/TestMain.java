@@ -1,6 +1,8 @@
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TestMain {
 
@@ -29,14 +31,10 @@ public class TestMain {
             File f = new File(args[1] + "/axne.htm");
             BufferedWriter bw = new BufferedWriter(new FileWriter(f));
             bw.write("<html>");
-            bw.write("<head>");
-            bw.write("<title> Exercise-1 </title>");
-            bw.write("<style>table, th, td {border: 1px solid black; border-collapse: collapse;}th, td { padding: 5px; text-align: left; }</style>");
-            bw.write("</head> <body>");
-            bw.write("<h2><font color = \"red\"> Report for git repository in : </font> <a href=\""+ args[1] +"\">"+ args[1] +"</a></h2>");
-            bw.write("<table style=\"width:20%\">");
-            
-            
+            bw.write("<body>");
+            bw.write("<h1>ShowGeneratedHtml source</h1>");
+            bw.write("<textarea cols=75 rows=30>");
+
             //String line;
             //while ((line = br.readLine()) != null) {
             //    bw.write(line);
@@ -51,57 +49,74 @@ public class TestMain {
             String command;
             String output;
             
-            command = "cmd /C git ls-files | wc -l";
+            List<String> commiters = new ArrayList<String>();
+            int commiters_count=0;
+            
 
             //in windows
             //String command = "ping -n 3 " + domainName;
             
         	//System.getProperty("os.name").toLowerCase().startsWith("windows");
+            command = "cmd /C git ls-files | wc -l";
             output = obj.executeCommand(command, args[0]);
             
             //System.out.println(System.getProperty("user.dir"));
 
             System.out.println("Number of files is: \n" +  output);
-            bw.write("<tr><th>Number of files</th><th colspan=\"2\">"+ output+ "</th></tr>");
-            
-            
 
             //command = "git diff --stat 4b825dc642cb6eb9a060e54bf8d69288fbee4904";
-            //command = "cmd /C git ls-files | xargs wc /l";
-            //output = obj.executeCommand(command, args[0]);
-            //System.out.println("Number of total lines is: " +  output);
+            command = "cmd /C git ls-files | xargs wc -l";
+            output = obj.executeCommand(command, args[0]);
+            System.out.println("Number of total lines is: \n" +  output);
             
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
             command = "cmd /C git branch -ar | find /c /v \"\"";
             output = obj.executeCommand(command, args[0]);
             System.out.println("Number of total branches is: \n" +  output);
-            bw.write("<tr><th>Number of total branches</th><th colspan=\"2\">"+ output+ "</th></tr>");
             
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
             command = "cmd /C git tag | find /c /v \"\"";
             output = obj.executeCommand(command, args[0]);
             System.out.println("Number of total tags is: \n" +  output);
-            bw.write("<tr><th>Number of total tags</th><th colspan=\"2\">"+ output+ "</th></tr>");
             
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
             command = "cmd /C  git log | findstr Author: | sort | uniq | wc -l";
             output = obj.executeCommand(command, args[0]);
             System.out.println("Number of total committers is: \n" +  output);
-            bw.write("<tr><th>Number of total committers</th><th colspan=\"2\">"+ output+ "</th></tr>");
-            
-            
+            commiters_count = Integer.parseInt(output.split("\n")[0]);
+            System.out.println(commiters_count);
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
             command = "cmd /C  git log | findstr Author: | sort | wc -l";
             output = obj.executeCommand(command, args[0]);
             System.out.println("Number of total commits is: \n" +  output);
-            bw.write("<tr><th>Number of total commits</th><th colspan=\"2\">"+ output+ "</th></tr>");
+            
+            
+            /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+            for (int i = 0; i < commiters_count; i++) {
+            	command = "cmd /C  git log | grep Author: | sort | uniq | cut -d ' ' -f 2";
+                output = obj.executeCommand(command, args[0]);
+                commiters.add((output.split("\n")[i]));
+                //System.out.println(output.split("\n")[i]);
+			}
+            
+            for (String item:commiters) {
+            	System.out.println(item);
+            }
+            
+            //git log --author="Jon" | grep Author: | wc -l
+            for (String item:commiters) {
+            	command = "git log --author=\""+item+"\" | grep Author: | wc -l";
+                output = obj.executeCommand(command, args[0]);
+                System.out.println(item+" : "+ output);		//<--- Den trexei ...
+            }
             
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
             
             //System.out.println(countFiles(args[0]));
-            System.out.println("\nOLA GOOD (oxi)");
+            System.out.println("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\nOLA GOOD (oxi)");
 
-            bw.write("</table>");
+
+            bw.write("</text" + "area>");
             bw.write("</body>");
             bw.write("</html>");
 
@@ -134,6 +149,7 @@ public class TestMain {
             
             while ((line = reader.readLine()) != null) {
                 output.append(line+'\n');
+                System.out.println("line: "+line);
             	//counter++;
             }
             //System.out.println(counter);
