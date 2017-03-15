@@ -29,10 +29,14 @@ public class TestMain {
             File f = new File(args[1] + "/axne.htm");
             BufferedWriter bw = new BufferedWriter(new FileWriter(f));
             bw.write("<html>");
-            bw.write("<body>");
-            bw.write("<h1>ShowGeneratedHtml source</h1>");
-            bw.write("<textarea cols=75 rows=30>");
-
+            bw.write("<head>");
+            bw.write("<title> Exercise-1 </title>");
+            bw.write("<style>table, th, td {border: 1px solid black; border-collapse: collapse;}th, td { padding: 5px; text-align: left; }</style>");
+            bw.write("</head> <body>");
+            bw.write("<h2><font color = \"red\"> Report for git repository in : </font> <a href=\""+ args[1] +"\">"+ args[1] +"</a></h2>");
+            bw.write("<table style=\"width:20%\">");
+            
+            
             //String line;
             //while ((line = br.readLine()) != null) {
             //    bw.write(line);
@@ -58,6 +62,9 @@ public class TestMain {
             //System.out.println(System.getProperty("user.dir"));
 
             System.out.println("Number of files is: \n" +  output);
+            bw.write("<tr><th>Number of files</th><th colspan=\"2\">"+ output+ "</th></tr>");
+            
+            
 
             //command = "git diff --stat 4b825dc642cb6eb9a060e54bf8d69288fbee4904";
             //command = "cmd /C git ls-files | xargs wc /l";
@@ -68,16 +75,20 @@ public class TestMain {
             command = "cmd /C git branch -ar | find /c /v \"\"";
             output = obj.executeCommand(command, args[0]);
             System.out.println("Number of total branches is: \n" +  output);
+            bw.write("<tr><th>Number of total branches</th><th colspan=\"2\">"+ output+ "</th></tr>");
             
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
             command = "cmd /C git tag | find /c /v \"\"";
             output = obj.executeCommand(command, args[0]);
             System.out.println("Number of total tags is: \n" +  output);
+            bw.write("<tr><th>Number of total tags</th><th colspan=\"2\">"+ output+ "</th></tr>");
             
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
             command = "cmd /C  git log | findstr Author: | sort | uniq | wc -l";
             output = obj.executeCommand(command, args[0]);
             System.out.println("Number of total committers is: \n" +  output);
+            bw.write("<tr><th>Number of total committers</th><th colspan=\"2\">"+ output+ "</th></tr>");
+            
             
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
             //command = "git log";
@@ -90,8 +101,7 @@ public class TestMain {
             //System.out.println(countFiles(args[0]));
             System.out.println("\nOLA GOOD (oxi)");
 
-
-            bw.write("</text" + "area>");
+            bw.write("</table>");
             bw.write("</body>");
             bw.write("</html>");
 
