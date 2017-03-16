@@ -162,10 +162,10 @@ public class MainReport {
     
     private static String totalLines(String out){
     	String[] parts = out.split("\n");
-    	out = parts[parts.length-1].replace("total" , ""); //remove the word total
-    	//for (String i : parts)
-    	//	System.out.println(i);
-    	parts = out.split(" ");   //remove whitespaces from beginning
+    	//remove the word total
+    	out = parts[parts.length-1].replace("total" , ""); 
+    	//remove whitespaces from beginning
+    	parts = out.split("\\s+");   
 		return parts[1];
     }
     

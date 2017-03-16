@@ -60,13 +60,6 @@ public class BranchReport {
         
         return output.toString();
     }
-    
-    private static String totalLines(String out){
-    	String[] parts = out.split("\n");
-    	out = parts[parts.length-1].replace("total" , "");
-    	//for (String i : parts)
-    	//	System.out.println(i);
-		return out.substring(2);
-    }
+
     
 }
