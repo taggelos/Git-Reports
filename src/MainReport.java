@@ -24,7 +24,7 @@ public class MainReport {
             bw.write("<title> Exercise-1 </title>");
             bw.write("<style>table, th, td {border: 1px solid black; border-collapse: collapse;}th, td { padding: 5px; text-align: left; }</style>");
             bw.write("</head> <body bgcolor=\"#fcf5ef\" >");
-            bw.write("<h2><font color = \"red\"> Report for </font> <a href=\""+ args[1] +"\"> Git repository </a></h2>");
+            bw.write("<h2><font color = \"red\"> Report for </font> <a target=\"_blank\" href=\""+ args[1] +"\"> Git repository </a></h2>");
             bw.write("<table bgcolor=\"#FFFFFF\" style=\"width:15%\">");
             
             MainReport obj = new MainReport();
