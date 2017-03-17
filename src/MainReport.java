@@ -59,6 +59,8 @@ public class MainReport {
             output = obj.executeCommand(command, args[0]);
             System.out.println("Number of total branches is: \n" +  output);
             bw.write("<tr><th>Number of total branches</th><th>" + output+ "</th></tr>");
+            int numBranches = Integer.parseInt(output.replace("\n", ""));
+            
             
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
             command = "cmd /C git tag | wc -l";
@@ -125,6 +127,9 @@ public class MainReport {
             System.out.println("\nOLA GOOD (oxi)");
 
             bw.write("</table>");
+            
+            createBranchTable(numBranches,bw,args[0]);
+            
             bw.write("</body>");
             bw.write("</html>");
 
@@ -133,17 +138,16 @@ public class MainReport {
         } catch (IOException ignored) {
 
         }
-        BranchReport.create(args[0]);
 
     }
 
-    private String executeCommand(String command, String arg) {
+    private String executeCommand(String command, String path) {
 
         StringBuilder output = new StringBuilder();
 
         Process p;
         try {
-            p = Runtime.getRuntime().exec(command, null, new File(arg));
+            p = Runtime.getRuntime().exec(command, null, new File(path));
             p.waitFor();
             //System.out.println(p.exitValue());
             BufferedReader reader =
@@ -156,7 +160,7 @@ public class MainReport {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
+        //.substring(0,output.length()-2)
         return output.toString();
     }
     
@@ -167,6 +171,25 @@ public class MainReport {
     	//remove whitespaces from beginning
     	parts = out.split("\\s+");   
 		return parts[1];
+    }
+    
+     private static void createBranchTable(int num, BufferedWriter bw, String path) throws IOException{
+	    bw.write("<br>");
+	    bw.write("<h2><font color = \"red\"> Branches </font></h2>");
+    	bw.write("<br>");
+    	bw.write("<table bgcolor=\"#FFFFFF\" style=\"width:15%\">");
+    	bw.write("<tr><th>Name</th><th>Date of Creation</th><th>Last Date of Modification</th></tr>");
+    	for (int i=0; i<num;i++){
+    		bw.write("<tr>");
+    		bw.write("<td> <a target=\"_blank\" href= \"axne2.htm\" >55577854 </a></td>");
+    		bw.write("<td> 55577854 </td>");
+    		bw.write("<td> 55577854 </td>");  
+
+        	bw.write("</tr>");
+    	}
+    	bw.write("</table>");
+    	String name = "TestBranch";  //TODO
+    	BranchReport.create(path, name);
     }
     
 }

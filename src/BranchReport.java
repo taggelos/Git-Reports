@@ -7,7 +7,7 @@ import java.util.List;
 public class BranchReport {
 
 
-    public static void create(String path) {
+    public static void create(String path, String name) {
 
         try {
             File f = new File(path + "/axne2.htm");
@@ -17,7 +17,7 @@ public class BranchReport {
             bw.write("<title> Exercise-1 </title>");
             bw.write("<style>table, th, td {border: 1px solid black; border-collapse: collapse;}th, td { padding: 5px; text-align: left; }</style>");
             bw.write("</head> <body bgcolor=\"#fcf5ef\" >");
-            bw.write("<h2><font color = \"red\"> Branch Report </font> </h2>");
+            bw.write("<h2><font color = \"blue\">" + name + "</font><font color = \"red\"> Branch Report </font> </h2>");
             bw.write("<table bgcolor=\"#FFFFFF\" style=\"width:15%\">");
             
             bw.write("<tr><th>Id</th><th>Message</th><th>Date</th><th>Author</th><th>Release</th>");
