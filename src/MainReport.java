@@ -34,6 +34,7 @@ public class MainReport {
             
             List<String> commiters = new ArrayList<String>();
             int commiters_count=0;
+            int commits=0;
             
             command = "cmd /C git ls-files | wc -l";
 
@@ -73,17 +74,18 @@ public class MainReport {
             output = obj.executeCommand(command, args[0]);
             System.out.println("Number of total committers is: \n" +  output);
             bw.write("<tr><th>Number of total committers</th><th>" + output+ "</th></tr>");
-            
+            commiters_count = Integer.valueOf(output.substring(0, output.length()-1));
             
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
             command = "cmd /C  git log | findstr Author: | sort | wc -l";
             output = obj.executeCommand(command, args[0]);
             System.out.println("Number of total commits is: \n" +  output);
             bw.write("<tr><th>Number of total commits</th><th>" + output+ "</th></tr>");
+            commits = Integer.valueOf(output.substring(0, output.length()-1));
             
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
             
-            
+            /*
             for (int i = 0; i < commiters_count; i++) {
             	command = "cmd /C  git log | grep Author: | sort | uniq | cut -d ' ' -f 2";
                 output = obj.executeCommand(command, args[0]);
@@ -101,10 +103,11 @@ public class MainReport {
                 output = obj.executeCommand(command, args[0]);
                 System.out.println(item+" : "+ output);		//<--- Den trexei ...
             }
+            */
             
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/  //Tha xreiastei gia pososto commits ana suggrafea
             
-            command = "cmd /C  git shortlog -sn --all";
+            command = "cmd /C  git shortlog -sne --all";
             output = obj.executeCommand(command, args[0]);
             System.out.println("Number of commits per User: \n" +  output);
             //bw.write("<tr><th>Number of commits per User</th><th>" + output+ "</th></tr>");
@@ -112,6 +115,26 @@ public class MainReport {
             
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/ //
             
+            //git shotlog -sn --all | cut -f 1  <---
+            //git shotlog -sn --all | cut -f 2
+            
+            String s;
+            int[] c;
+            for (int i = 0; i < commiters_count; i++) {
+            	command = "cmd /C  git shortlog -sne --all";
+            	output = obj.executeCommand(command, args[0]);
+
+            	s = output.split("\n")[i];
+            	while(s.startsWith(" ")){
+            		s=s.replaceFirst(" ", "");
+            	}
+ 
+            	commiters.add((s.split("\t")[0]));
+            	//c[0] = Integer.valueOf(s.split("\t")[0]);
+            	System.out.println("--> "+ s.split("\t")[0]);
+            	System.out.println("--> "+ s.split("\t")[1]);
+            	System.out.println("--> "+ (Float.valueOf(s.split("\t")[0])/commits)*100 + "%");
+            }
             
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/  //Tha xreiastei gia onomasia branches
             
