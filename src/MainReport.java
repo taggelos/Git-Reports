@@ -32,7 +32,7 @@ public class MainReport {
             String command;
             String output;
             
-            List<String> commiters = new ArrayList<String>();
+            
             int commiters_count=0;
             int commits=0;
             
@@ -118,23 +118,6 @@ public class MainReport {
             //git shotlog -sn --all | cut -f 1  <---
             //git shotlog -sn --all | cut -f 2
             
-            String s;
-            int[] c;
-            for (int i = 0; i < commiters_count; i++) {
-            	command = "cmd /C  git shortlog -sne --all";
-            	output = obj.executeCommand(command, args[0]);
-
-            	s = output.split("\n")[i];
-            	while(s.startsWith(" ")){
-            		s=s.replaceFirst(" ", "");
-            	}
- 
-            	commiters.add((s.split("\t")[0]));
-            	//c[0] = Integer.valueOf(s.split("\t")[0]);
-            	System.out.println("--> "+ s.split("\t")[0]);
-            	System.out.println("--> "+ s.split("\t")[1]);
-            	System.out.println("--> "+ (Float.valueOf(s.split("\t")[0])/commits)*100 + "%");
-            }
             
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/  //Tha xreiastei gia onomasia branches
             
@@ -149,6 +132,19 @@ public class MainReport {
             
             System.out.println("\nOLA GOOD (oxi)");
 
+            bw.write("</table>");
+            
+            bw.write("<br>");
+    	    bw.write("<h2><font color = \"red\"> Commiters </font></h2>");
+        	bw.write("<br>");
+        	bw.write("<table bgcolor=\"#FFFFFF\" style=\"width:15%\">");
+        	bw.write("<tr><th>Name</th><th>Number of commits</th><th>Percentage</th></tr>");
+
+            for (int i = 0; i < commiters_count; i++) {
+             	command = "cmd /C  git shortlog -sne --all";
+             	output = obj.executeCommand(command, args[0]);
+             	computePercentages(output, bw, args[0], i, commits);	
+            }
             bw.write("</table>");
             
             createBranchTable(numBranches,bw,args[0]);
@@ -187,6 +183,8 @@ public class MainReport {
         return output.toString();
     }
     
+    //git for-each-ref --sort=committerdate --format=%(committerdate:iso8601)%09%(refname) refs/heads
+    
     private static String totalLines(String out){
     	String[] parts = out.split("\n");
     	//remove the word total
@@ -215,4 +213,28 @@ public class MainReport {
     	BranchReport.create(path, name);
     }
     
+     private static List<String> computePercentages(String out, BufferedWriter bw, String path, int i, int commits) throws IOException {
+		String s;
+		int[] c;
+		List<String> commiters = new ArrayList<String>();
+     
+     	s = out.split("\n")[i];
+     	while(s.startsWith(" ")){
+     		s=s.replaceFirst(" ", "");
+     	}
+
+     	commiters.add((s.split("\t")[0]));
+     	//c[0] = Integer.valueOf(s.split("\t")[0]);
+     	System.out.println("--> "+ s.split("\t")[0]);
+     	System.out.println("--> "+ s.split("\t")[1]);
+     	System.out.println("--> "+ (Float.valueOf(s.split("\t")[0])/commits)*100 + "%");
+     	
+     	bw.write("<tr>");
+     	bw.write("<td>"+ s.split("\t")[1] +"</td>");
+     	bw.write("<td> "+ s.split("\t")[0] +"</td>");
+     	bw.write("<td>" + (Float.valueOf(s.split("\t")[0])/commits)*100 + "%</td>");
+     	bw.write("<tr>");
+     	
+        return commiters; 
+     }
 }
