@@ -32,7 +32,7 @@ public class MainReport {
             String command;
             String output;
             
-            List<String> commiters = new ArrayList<String>();
+            
             int commiters_count=0;
             int commits=0;
             
@@ -118,22 +118,10 @@ public class MainReport {
             //git shotlog -sn --all | cut -f 1  <---
             //git shotlog -sn --all | cut -f 2
             
-            String s;
-            int[] c;
             for (int i = 0; i < commiters_count; i++) {
-            	command = "cmd /C  git shortlog -sne --all";
-            	output = obj.executeCommand(command, args[0]);
-
-            	s = output.split("\n")[i];
-            	while(s.startsWith(" ")){
-            		s=s.replaceFirst(" ", "");
-            	}
- 
-            	commiters.add((s.split("\t")[0]));
-            	//c[0] = Integer.valueOf(s.split("\t")[0]);
-            	System.out.println("--> "+ s.split("\t")[0]);
-            	System.out.println("--> "+ s.split("\t")[1]);
-            	System.out.println("--> "+ (Float.valueOf(s.split("\t")[0])/commits)*100 + "%");
+             	command = "cmd /C  git shortlog -sne --all";
+             	output = obj.executeCommand(command, args[0]);
+             	computePercentages(output, bw, args[0], i, commits);
             }
             
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/  //Tha xreiastei gia onomasia branches
@@ -215,4 +203,22 @@ public class MainReport {
     	BranchReport.create(path, name);
     }
     
+     private static List<String> computePercentages(String out, BufferedWriter bw, String path, int i, int commits) {
+		String s;
+		int[] c;
+		List<String> commiters = new ArrayList<String>();
+     
+     	s = out.split("\n")[i];
+     	while(s.startsWith(" ")){
+     		s=s.replaceFirst(" ", "");
+     	}
+
+     	commiters.add((s.split("\t")[0]));
+     	//c[0] = Integer.valueOf(s.split("\t")[0]);
+     	System.out.println("--> "+ s.split("\t")[0]);
+     	System.out.println("--> "+ s.split("\t")[1]);
+     	System.out.println("--> "+ (Float.valueOf(s.split("\t")[0])/commits)*100 + "%");
+     	
+        return commiters; 
+     }
 }
