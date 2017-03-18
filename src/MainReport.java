@@ -17,7 +17,7 @@ public class MainReport {
         System.out.println("Total number of lines in the file are: " + " \n "+ args[0] + " \n " + args[1]);
 
         try {
-            File f = new File(args[1] + "/axne.htm");
+            File f = new File(args[1] + "/MainReport.htm");
             BufferedWriter bw = new BufferedWriter(new FileWriter(f));
             bw.write("<html>");
             bw.write("<head>");
@@ -46,20 +46,20 @@ public class MainReport {
             //System.out.println(System.getProperty("user.dir"));
 
             System.out.println("Number of files is: \n" +  output);
-            bw.write("<tr><th>Number of files</th><th>"+ output+ "</th></tr>");
+            bw.write("<tr><th>Number of files</th><td>"+ output+ "</td></tr>");
             
             
             //command = "git diff --stat 4b825dc642cb6eb9a060e54bf8d69288fbee4904";
             command = "cmd /C git ls-files | xargs wc -l";
             output = obj.executeCommand(command, args[0]);
             System.out.println("Number of total lines is: \n" +  totalLines(output)+ "\n") ;
-            bw.write("<tr><th>Number of total lines</th><th>" + totalLines(output)+ "</th></tr>");
+            bw.write("<tr><th>Number of total lines</th><td>" + totalLines(output)+ "</td></tr>");
             
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
             command = "cmd /C git branch -ar | wc -l";
             output = obj.executeCommand(command, args[0]);
             System.out.println("Number of total branches is: \n" +  output);
-            bw.write("<tr><th>Number of total branches</th><th>" + output+ "</th></tr>");
+            bw.write("<tr><th>Number of total branches</th><td>" + output+ "</td></tr>");
             int numBranches = Integer.parseInt(output.replace("\n", ""));
             
             
@@ -67,20 +67,21 @@ public class MainReport {
             command = "cmd /C git tag | wc -l";
             output = obj.executeCommand(command, args[0]);
             System.out.println("Number of total tags is: \n" +  output);
-            bw.write("<tr><th>Number of total tags</th><th>" + output+ "</th></tr>");
+            bw.write("<tr><th>Number of total tags</th><td>" + output+ "</td></tr>");
             
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
             command = "cmd /C  git log | findstr Author: | sort | uniq | wc -l";
             output = obj.executeCommand(command, args[0]);
             System.out.println("Number of total committers is: \n" +  output);
-            bw.write("<tr><th>Number of total committers</th><th>" + output+ "</th></tr>");
+            bw.write("<tr><th>Number of total committers</th><td>" + output+ "</td></tr>");
             commiters_count = Integer.valueOf(output.substring(0, output.length()-1));
+          
             
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
             command = "cmd /C  git log | findstr Author: | sort | wc -l";
             output = obj.executeCommand(command, args[0]);
             System.out.println("Number of total commits is: \n" +  output);
-            bw.write("<tr><th>Number of total commits</th><th>" + output+ "</th></tr>");
+            bw.write("<tr><th>Number of total commits</th><td>" + output+ "</td></tr>");
             commits = Integer.valueOf(output.substring(0, output.length()-1));
             
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -104,49 +105,27 @@ public class MainReport {
                 System.out.println(item+" : "+ output);		//<--- Den trexei ...
             }
             */
+
             
-            /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/  //Tha xreiastei gia pososto commits ana suggrafea
-            
-            command = "cmd /C  git shortlog -sne --all";
-            output = obj.executeCommand(command, args[0]);
-            System.out.println("Number of commits per User: \n" +  output);
-            //bw.write("<tr><th>Number of commits per User</th><th>" + output+ "</th></tr>");
-            
-            
-            /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/ //
-            
+            System.out.println("\nOLA GOOD (oxi)");
+
+           
             //git shotlog -sn --all | cut -f 1  <---
             //git shotlog -sn --all | cut -f 2
             
             
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/  //Tha xreiastei gia onomasia branches
             
-            command = "cmd /C git for-each-ref --sort=-committerdate refs/heads/";
-            output = obj.executeCommand(command, args[0]);
+            /*command = "cmd /C git for-each-ref --sort=-committerdate refs/heads/";
+            output = obj.executeCommand(command,args[0]);
             System.out.println("Number of commits per User: \n" +  output);
-            //bw.write("<tr><th>Number of commits per User</th><th>" + output+ "</th></tr>");
+            //bw.write("<tr><th>Number of commits per User</th><th>" + output+ "</th></tr>");*/
             
             
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
             
-            
-            System.out.println("\nOLA GOOD (oxi)");
-
-            bw.write("</table>");
-            
-            bw.write("<br>");
-    	    bw.write("<h2><font color = \"red\"> Commiters </font></h2>");
-        	bw.write("<br>");
-        	bw.write("<table bgcolor=\"#FFFFFF\" style=\"width:15%\">");
-        	bw.write("<tr><th>Name</th><th>Number of commits</th><th>Percentage</th></tr>");
-
-            for (int i = 0; i < commiters_count; i++) {
-             	command = "cmd /C  git shortlog -sne --all";
-             	output = obj.executeCommand(command, args[0]);
-             	computePercentages(output, bw, args[0], i, commits);	
-            }
-            bw.write("</table>");
-            
+            List<String> commiters = new ArrayList<String>();
+            commiters =createCommitersTable(output,bw, args[0], commiters_count, commits, obj);
             createBranchTable(numBranches,bw,args[0]);
             
             bw.write("</body>");
@@ -194,15 +173,60 @@ public class MainReport {
 		return parts[1];
     }
     
-     private static void createBranchTable(int num, BufferedWriter bw, String path) throws IOException{
+    
+    private static List<String> createCommitersTable(String out, BufferedWriter bw, String path, int commiters_count, int commits, MainReport obj) throws IOException {
+    	String s,command;
+       
+    	bw.write("</table>");
+        
+        bw.write("<br>");
+	    bw.write("<h2><font color = \"red\"> Commiters </font></h2>");
+    	bw.write("<br>");
+    	bw.write("<table bgcolor=\"#FFFFFF\" style=\"width:15%\">");
+    	bw.write("<tr><th>Name</th><th>Number of commits</th><th>Percentage of Commits</th></tr>");
+    	
+    	
+        List<String> commiters = new ArrayList<String>();
+        for (int i = 0; i < commiters_count; i++) {
+         	command = "cmd /C  git shortlog -sne --all";
+         	out = obj.executeCommand(command, path);
+         	
+            
+         	s = out.split("\n")[i];
+         	while(s.startsWith(" ")){
+         		s=s.replaceFirst(" ", "");
+         	}
+
+         	commiters.add((s.split("\t")[1]).split("<")[0]);
+         	//c[0] = Integer.valueOf(s.split("\t")[0]);
+         	System.out.println("--> "+ s.split("\t")[0]);
+         	System.out.println("--> "+ s.split("\t")[1]);
+         	System.out.println("--> "+ (Float.valueOf(s.split("\t")[0])/commits)*100 + "%");
+         	
+         	String name =commiters.get(i).replace(" ","");
+         	CommitersReport.create(path,name );
+         	bw.write("<tr>");
+         	System.out.println("23222222 --> "+ i +" <--s->>"+name+"<---");
+         	bw.write("<td><a target=\"_blank\" href="+path+"/userReports/"+name+".htm>" + s.split("\t")[1] + "</a></td>");
+         	bw.write("<td> "+ s.split("\t")[0] +"</td>");
+         	bw.write("<td>" + (Float.valueOf(s.split("\t")[0])/commits)*100 + "%</td>");
+         	bw.write("<tr>");	
+         	System.out.println("asdasdasdas --> "+ i +" <--s->>"+commiters.get(i));	
+        }
+        bw.write("</table>");
+        return commiters;
+    }
+    
+    
+     private static void createBranchTable(int brnum, BufferedWriter bw, String path) throws IOException{
 	    bw.write("<br>");
 	    bw.write("<h2><font color = \"red\"> Branches </font></h2>");
     	bw.write("<br>");
     	bw.write("<table bgcolor=\"#FFFFFF\" style=\"width:15%\">");
     	bw.write("<tr><th>Name</th><th>Date of Creation</th><th>Last Date of Modification</th></tr>");
-    	for (int i=0; i<num;i++){
+    	for (int i=0; i<brnum;i++){
     		bw.write("<tr>");
-    		bw.write("<td> <a target=\"_blank\" href= \"axne2.htm\" >55577854 </a></td>");
+    		bw.write("<td> <a target=\"_blank\" href= \"BranchReport.htm\" >55577854 </a></td>");
     		bw.write("<td> 55577854 </td>");
     		bw.write("<td> 55577854 </td>");  
 
@@ -211,30 +235,6 @@ public class MainReport {
     	bw.write("</table>");
     	String name = "TestBranch";  //TODO
     	BranchReport.create(path, name);
-    }
+    } 
     
-     private static List<String> computePercentages(String out, BufferedWriter bw, String path, int i, int commits) throws IOException {
-		String s;
-		int[] c;
-		List<String> commiters = new ArrayList<String>();
-     
-     	s = out.split("\n")[i];
-     	while(s.startsWith(" ")){
-     		s=s.replaceFirst(" ", "");
-     	}
-
-     	commiters.add((s.split("\t")[0]));
-     	//c[0] = Integer.valueOf(s.split("\t")[0]);
-     	System.out.println("--> "+ s.split("\t")[0]);
-     	System.out.println("--> "+ s.split("\t")[1]);
-     	System.out.println("--> "+ (Float.valueOf(s.split("\t")[0])/commits)*100 + "%");
-     	
-     	bw.write("<tr>");
-     	bw.write("<td>"+ s.split("\t")[1] +"</td>");
-     	bw.write("<td> "+ s.split("\t")[0] +"</td>");
-     	bw.write("<td>" + (Float.valueOf(s.split("\t")[0])/commits)*100 + "%</td>");
-     	bw.write("<tr>");
-     	
-        return commiters; 
-     }
 }
