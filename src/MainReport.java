@@ -58,10 +58,9 @@ public class MainReport {
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
             command = "cmd /C git branch -ar | wc -l";
             output = obj.executeCommand(command, args[0]);
-            System.out.println("Number of total branches is: \n" +  output);
-            bw.write("<tr><th>Number of total branches</th><td>" + output+ "</td></tr>");
-            int numBranches = Integer.parseInt(output.replace("\n", ""));
-            
+            int numBranches = Integer.parseInt(output.replace("\n", ""))-1;
+            System.out.println("Number of total branches is: \n" +  numBranches);
+            bw.write("<tr><th>Number of total branches</th><td>" + numBranches+ "</td></tr>");
             
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
             command = "cmd /C git tag | wc -l";
@@ -125,8 +124,10 @@ public class MainReport {
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
             
             List<String> commiters = new ArrayList<String>();
-            commiters =createCommitersTable(output,bw, args[0], commiters_count, commits, obj);
-            createBranchTable(numBranches,bw,args[0]);
+            commiters =createCommitersTable(output,bw, args[0], args[1] , commiters_count, commits, obj);
+            createBranchTable(numBranches,bw, args[0], args[1], obj);
+            System.out.println("\n--------------------------------------");
+            
             
             bw.write("</body>");
             bw.write("</html>");
@@ -174,7 +175,7 @@ public class MainReport {
     }
     
     
-    private static List<String> createCommitersTable(String out, BufferedWriter bw, String path, int commiters_count, int commits, MainReport obj) throws IOException {
+    private static List<String> createCommitersTable(String out, BufferedWriter bw, String path, String path2, int commiters_count, int commits, MainReport obj) throws IOException {
     	String s,command;
        
     	bw.write("</table>");
@@ -204,10 +205,10 @@ public class MainReport {
          	System.out.println("--> "+ (Float.valueOf(s.split("\t")[0])/commits)*100 + "%");
          	
          	String name =commiters.get(i).replace(" ","");
-         	CommitersReport.create(path,name );
+         	CommitersReport.create(path2,name );
          	bw.write("<tr>");
          	System.out.println("23222222 --> "+ i +" <--s->>"+name+"<---");
-         	bw.write("<td><a target=\"_blank\" href="+path+"/userReports/"+name+".htm>" + s.split("\t")[1] + "</a></td>");
+         	bw.write("<td><a target=\"_blank\" href="+path2+"/userReports/"+name+".htm>" + s.split("\t")[1] + "</a></td>");
          	bw.write("<td> "+ s.split("\t")[0] +"</td>");
          	bw.write("<td>" + (Float.valueOf(s.split("\t")[0])/commits)*100 + "%</td>");
          	bw.write("<tr>");	
@@ -218,23 +219,36 @@ public class MainReport {
     }
     
     
-     private static void createBranchTable(int brnum, BufferedWriter bw, String path) throws IOException{
+     private static void createBranchTable(int brnum, BufferedWriter bw, String path, String path2, MainReport obj) throws IOException{
 	    bw.write("<br>");
 	    bw.write("<h2><font color = \"red\"> Branches </font></h2>");
     	bw.write("<br>");
     	bw.write("<table bgcolor=\"#FFFFFF\" style=\"width:15%\">");
     	bw.write("<tr><th>Name</th><th>Date of Creation</th><th>Last Date of Modification</th></tr>");
+    	
+    	String com, out;
+    	String date, auth, br;
     	for (int i=0; i<brnum;i++){
+    		com = "git for-each-ref --sort=-committerdate refs/heads/ --format=%(committerdate:short),%(authorname),%(refname:short)";
+         	out = obj.executeCommand(com, path);
+         	out = out.split("\n")[i];
+         	
+         	date = out.split(",")[0];
+         	auth = out.split(",")[1];
+         	br = out.split(",")[2];
+         	System.out.println("--> "+ date + " " + auth + " " + br);
+         	BranchReport.create(path2, br);
+         	
     		bw.write("<tr>");
-    		bw.write("<td> <a target=\"_blank\" href= \"BranchReport.htm\" >55577854 </a></td>");
-    		bw.write("<td> 55577854 </td>");
-    		bw.write("<td> 55577854 </td>");  
+    		bw.write("<td><a target=\"_blank\" href="+path2+"/branchReports/"+br+".htm>" + br+ "</a></td>");
+    		//bw.write("<td> <a target=\"_blank\" href= \"BranchReport.htm\" >"+br+"</a></td>");
+    		bw.write("<td>"+date+"</td>");
+    		bw.write("<td>"+date+"</td>");  
 
         	bw.write("</tr>");
     	}
     	bw.write("</table>");
-    	String name = "TestBranch";  //TODO
-    	BranchReport.create(path, name);
+    	
     } 
     
 }

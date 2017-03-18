@@ -22,6 +22,7 @@ public class CommitersReport {
         	    }
         	}
             File f = new File(path + "/userReports/"+name+".htm");
+            System.out.println("--->"+f.getAbsolutePath()+"<---");
             BufferedWriter bw = new BufferedWriter(new FileWriter(f));
             bw.write("<html>");
             bw.write("<head>");
@@ -44,7 +45,7 @@ public class CommitersReport {
             //br.close();
             bw.close();
         } catch (IOException ignored) {
-
+        	ignored.printStackTrace();
         }
 
     }
