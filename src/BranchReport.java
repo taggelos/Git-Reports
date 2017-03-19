@@ -65,6 +65,7 @@ public class BranchReport {
             List<String> date = new ArrayList<String>();
             List<String> author = new ArrayList<String>();
             List<String> tag = new ArrayList<String>();
+            List<String> tags = new ArrayList<String>();
             
             System.out.println("aaaaaaaa: " +name +" aaaaaaaaaaaaa \n");
             for (int i=0; i<commits;i++){
@@ -101,13 +102,17 @@ public class BranchReport {
                 output = obj.executeCommand(command, path);
                 //output.split("/n");
                 tag.add(output);
+                
+                line = tag.get(i).replace("\n", " / ");
+                if(tag.get(i).length() != 0)
+                	line = line.substring(0, line.length()-2);
             	
-            	System.out.println("line:" + line + " id-> " + id.get(i) + " msg ->" + msg.get(i)+" \n");
+            	System.out.println("line:" + line + " id-> " + id.get(i) + " tag ->" + tag.get(i)+" \n");
             	bw.write("<td>" + id.get(i) +" </td>"  );
             	bw.write("<td>" + msg.get(i) +" </td>"  );
             	bw.write("<td>" + date.get(i) +" </td>"  );
             	bw.write("<td>" + author.get(i) +" </td>"  );
-            	bw.write("<td>" + tag.get(i) +" </td>"  );
+            	bw.write("<td>" + line +" </td>"  );
             	bw.write("</tr>");
             }
             
