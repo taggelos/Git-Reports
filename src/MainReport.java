@@ -227,23 +227,43 @@ public class MainReport {
     	bw.write("<tr><th>Name</th><th>Date of Creation</th><th>Last Date of Modification</th></tr>");
     	
     	String com, out;
-    	String date, auth, br;
+    	ArrayList<String> date = new ArrayList<>();
+    	ArrayList<String> auth = new ArrayList<>();
+    	ArrayList<String> br = new ArrayList<>();
     	for (int i=0; i<brnum;i++){
     		com = "git for-each-ref --sort=-committerdate refs/heads/ --format=%(committerdate:short),%(authorname),%(refname:short)";
          	out = obj.executeCommand(com, path);
          	out = out.split("\n")[i];
          	
-         	date = out.split(",")[0];
-         	auth = out.split(",")[1];
-         	br = out.split(",")[2];
-         	System.out.println("--> "+ date + " " + auth + " " + br);
-         	BranchReport.create(path2, br);
+         	date.add(out.split(",")[0]);
+         	auth.add(out.split(",")[1]);
+         	br.add(out.split(",")[2]);
+         	//System.out.println("AAAAA -->"+ date.get(i) + " " + auth.get(i) + " " + br.get(i));
+         	BranchReport.create(path2, br.get(i));
          	
     		bw.write("<tr>");
-    		bw.write("<td><a target=\"_blank\" href="+path2+"/branchReports/"+br+".htm>" + br+ "</a></td>");
+    		bw.write("<td><a target=\"_blank\" href="+path2+"/branchReports/"+br.get(i)+".htm>" + br.get(i)+ "</a></td>");
     		//bw.write("<td> <a target=\"_blank\" href= \"BranchReport.htm\" >"+br+"</a></td>");
-    		bw.write("<td>"+date+"</td>");
-    		bw.write("<td>"+date+"</td>");  
+    		
+    		
+    		// git log <br>...<br> --date=format:%Y-%m-%d,%H:%M:%S | grep Date: | tail -1
+    		
+    		if(br.get(i).equals("master")) {
+    			com = "cmd /C git log master --date=format:%Y-%m-%d | grep Date: | tail -1";
+    		}
+    		else {
+    			com = "cmd /C git log master..."+br.get(i)+" --date=format:%Y-%m-%d | grep Date: | tail -1";
+    		}
+    		
+    		out = obj.executeCommand(com, path);
+    		
+    		out = out.replace("Date:", "");
+    		out = out.replaceAll(" ", "");
+    		System.out.println("EDWWWWW -->"+out);
+    		
+    		bw.write("<td>"+out+"</td>");  
+    		
+    		bw.write("<td>"+date.get(i)+"</td>");
 
         	bw.write("</tr>");
     	}
