@@ -35,7 +35,7 @@ public class BranchReport {
             bw.write("<tr><th>Id</th><th>Message</th><th>Date</th><th>Author</th><th>Release</th>");
             
             BranchReport obj = new BranchReport();
-            String command,output,outputauthor,outputdate;
+            String command,output,outputauthor,outputdate,outputid;
 
             int commits=0;
             
@@ -50,8 +50,7 @@ public class BranchReport {
             System.out.println("Number of total branch commits is: \n" +  output);
            
             command = "cmd /C  git log "+name+" --oneline";
-            System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"+ name);
-            output = obj.executeCommand(command, path);
+            outputid = obj.executeCommand(command, path);
             
             command = "cmd /C git log "+name +" --date=format:%Y-%m-%d | grep Date: ";
             outputdate = obj.executeCommand(command, path);
@@ -65,12 +64,12 @@ public class BranchReport {
             List<String> msg = new ArrayList<String>();
             List<String> date = new ArrayList<String>();
             List<String> author = new ArrayList<String>();
-
+            List<String> tag = new ArrayList<String>();
             
             System.out.println("aaaaaaaa: " +name +" aaaaaaaaaaaaa \n");
             for (int i=0; i<commits;i++){
             	bw.write("<tr>");
-            	line = output.split("\n")[i];
+            	line = outputid.split("\n")[i];
             	// id + msg
             	
             	id.add(line.split(" ")[0]);
@@ -78,9 +77,7 @@ public class BranchReport {
             	
             	
             	// date
-            	
-            	
-                
+
             	outputdate= outputdate.replaceAll("Date:","");
                 line = outputdate.split("\n")[i];
                 while(line.startsWith(" ")){
@@ -90,21 +87,27 @@ public class BranchReport {
                 System.out.println("Number of total branch commits is LALLALALA: "+name +" \n" +  date.get(i));
             	
             	// author
-                
-                
-                
+             
                 outputauthor= outputauthor.replaceAll("Author:","");
                 line = outputauthor.split("\n")[i];
                 while(line.startsWith(" ")){
              		line=line.replaceFirst(" ", "");
              	}
                 author.add(line);
+                
+                // release - tag
+                
+                command = "cmd /C  git tag --contains "+id.get(i);
+                output = obj.executeCommand(command, path);
+                //output.split("/n");
+                tag.add(output);
             	
             	System.out.println("line:" + line + " id-> " + id.get(i) + " msg ->" + msg.get(i)+" \n");
             	bw.write("<td>" + id.get(i) +" </td>"  );
             	bw.write("<td>" + msg.get(i) +" </td>"  );
             	bw.write("<td>" + date.get(i) +" </td>"  );
             	bw.write("<td>" + author.get(i) +" </td>"  );
+            	bw.write("<td>" + tag.get(i) +" </td>"  );
             	bw.write("</tr>");
             }
             
