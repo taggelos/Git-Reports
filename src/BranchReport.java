@@ -27,15 +27,88 @@ public class BranchReport {
             bw.write("<html>");
             bw.write("<head>");
             bw.write("<title> "+name+" </title>");
-            bw.write("<style>table, th, td {border: 1px solid black; border-collapse: collapse;}th, td { padding: 5px; text-align: left; }</style>");
+            bw.write("<style>table, th, td {border: 1px solid black; border-collapse: collapse;}th, td { padding: 10px; text-align: left; }</style>");
             bw.write("</head> <body bgcolor=\"#fcf5ef\" >");
             bw.write("<h2><font color = \"blue\">" + name + "</font><font color = \"red\"> Branch Report </font> </h2>");
             bw.write("<table bgcolor=\"#FFFFFF\" style=\"width:15%\">");
             
             bw.write("<tr><th>Id</th><th>Message</th><th>Date</th><th>Author</th><th>Release</th>");
             
+            BranchReport obj = new BranchReport();
+            String command,output,outputauthor,outputdate;
+
+            int commits=0;
+            
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
             
+            command = "cmd /C  git log "+name+" --oneline | wc -l";
+            output = obj.executeCommand(command, path);
+            System.out.println("Number of total branch commits is: "+name +" \n" +  output);
+            commits = Integer.valueOf(output.substring(0, output.length()-1));
+            /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+            
+            System.out.println("Number of total branch commits is: \n" +  output);
+           
+            command = "cmd /C  git log "+name+" --oneline";
+            System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"+ name);
+            output = obj.executeCommand(command, path);
+            
+            command = "cmd /C git log "+name +" --date=format:%Y-%m-%d | grep Date: ";
+            outputdate = obj.executeCommand(command, path);
+            
+            command = "cmd /C git log "+name +" | grep Author: ";
+            outputauthor = obj.executeCommand(command, path);
+
+            //String[] parts = output.split("\n");
+            String line;
+            List<String> id = new ArrayList<String>();
+            List<String> msg = new ArrayList<String>();
+            List<String> date = new ArrayList<String>();
+            List<String> author = new ArrayList<String>();
+
+            
+            System.out.println("aaaaaaaa: " +name +" aaaaaaaaaaaaa \n");
+            for (int i=0; i<commits;i++){
+            	bw.write("<tr>");
+            	line = output.split("\n")[i];
+            	// id + msg
+            	
+            	id.add(line.split(" ")[0]);
+            	msg.add(line.split(" ", 2)[1]);
+            	
+            	
+            	// date
+            	
+            	
+                
+            	outputdate= outputdate.replaceAll("Date:","");
+                line = outputdate.split("\n")[i];
+                while(line.startsWith(" ")){
+             		line=line.replaceFirst(" ", "");
+             	}
+                date.add(line);
+                System.out.println("Number of total branch commits is LALLALALA: "+name +" \n" +  date.get(i));
+            	
+            	// author
+                
+                
+                
+                outputauthor= outputauthor.replaceAll("Author:","");
+                line = outputauthor.split("\n")[i];
+                while(line.startsWith(" ")){
+             		line=line.replaceFirst(" ", "");
+             	}
+                author.add(line);
+            	
+            	System.out.println("line:" + line + " id-> " + id.get(i) + " msg ->" + msg.get(i)+" \n");
+            	bw.write("<td>" + id.get(i) +" </td>"  );
+            	bw.write("<td>" + msg.get(i) +" </td>"  );
+            	bw.write("<td>" + date.get(i) +" </td>"  );
+            	bw.write("<td>" + author.get(i) +" </td>"  );
+            	bw.write("</tr>");
+            }
+            
+           
             System.out.println("\nOLA GOOD (oxi)");
 
             bw.write("</table>");
