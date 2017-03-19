@@ -56,9 +56,9 @@ public class MainReport {
             bw.write("<tr><th>Number of total lines</th><td>" + totalLines(output)+ "</td></tr>");
             
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-            command = "cmd /C git branch -ar | wc -l";
+            command = "cmd /C git branch | wc -l";
             output = obj.executeCommand(command, args[0]);
-            int numBranches = Integer.parseInt(output.replace("\n", ""))-1;
+            int numBranches = Integer.parseInt(output.replace("\n", ""));
             System.out.println("Number of total branches is: \n" +  numBranches);
             bw.write("<tr><th>Number of total branches</th><td>" + numBranches+ "</td></tr>");
             
