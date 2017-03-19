@@ -27,7 +27,7 @@ public class CommitersReport {
             bw.write("<html>");
             bw.write("<head>");
             bw.write("<title> "+name+" </title>");
-            bw.write("<style>table, th, td {border: 1px solid black; border-collapse: collapse;}th, td { padding: 5px; text-align: left; }</style>");
+            bw.write("<style>table, th, td {border: 1px solid black; border-collapse: collapse; white-space: nowrap;}th, td { padding: 5px; text-align: left; }</style>");
             bw.write("</head> <body bgcolor=\"#fcf5ef\" >");
             bw.write("<h2><font color = \"blue\">" + name + "</font><font color = \"red\"> Report </font> </h2>");
             bw.write("<table bgcolor=\"#FFFFFF\" style=\"width:15%\">");
