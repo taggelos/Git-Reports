@@ -7,10 +7,10 @@ import java.util.List;
 public class BranchReport {
 
 
-    public static void create(String path, String name) {
+    public static void create(List <String> paths, String name, MainReport obj) {
 
         try {
-        	File myDir = new File("branchReports");
+        	File myDir = new File(paths.get(1) , "branchReports");
         	// if the directory does not exist, create it
         	if (!myDir.exists()) {
         	    System.out.println("creating directory: " + myDir.getName());
@@ -22,7 +22,7 @@ public class BranchReport {
         	        System.out.println("DIR created");  
         	    }
         	}
-            File f = new File(path + "/branchReports/"+name+".htm");
+        	File f = new File(myDir, name+".htm");
             BufferedWriter bw = new BufferedWriter(new FileWriter(f));
             bw.write("<html>");
             bw.write("<head>");
@@ -34,7 +34,6 @@ public class BranchReport {
             
             bw.write("<tr><th>Id</th><th>Message</th><th>Date</th><th>Author</th><th>Release</th>");
             
-            BranchReport obj = new BranchReport();
             String command,output,outputauthor,outputdate,outputid;
 
             int commits=0;
@@ -42,22 +41,23 @@ public class BranchReport {
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
             
             command = "cmd /C  git log "+name+" --oneline | wc -l";
-            output = obj.executeCommand(command, path);
-            System.out.println("Number of total branch commits is: "+name +" \n" +  output);
+            output = obj.executeCommand(command, paths.get(0));
             commits = Integer.valueOf(output.substring(0, output.length()-1));
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
             
-            System.out.println("Number of total branch commits is: \n" +  output);
+            System.out.println("Number of total branch -> " + name +  " commits is: \n" +  output);
            
-            command = "cmd /C  git log "+name+" --oneline";
-            outputid = obj.executeCommand(command, path);
+            command = "cmd /C git log "+name+" --oneline | cat";
+            outputid = obj.executeCommand(command, paths.get(0));
             
-            command = "cmd /C git log "+name +" --date=format:%Y-%m-%d | grep Date: ";
-            outputdate = obj.executeCommand(command, path);
             
-            command = "cmd /C git log "+name +" | grep Author: ";
-            outputauthor = obj.executeCommand(command, path);
-
+            command = "cmd /C git log "+name +" --date=format:%Y-%m-%d | grep Date: | cat ";
+            outputdate = obj.executeCommand(command, paths.get(0));
+            
+            command = "cmd /C git log "+name +" | grep Author: | cat";
+            outputauthor = obj.executeCommand(command, paths.get(0));
+            
+            
             //String[] parts = output.split("\n");
             String line;
             List<String> id = new ArrayList<String>();
@@ -65,9 +65,7 @@ public class BranchReport {
             List<String> date = new ArrayList<String>();
             List<String> author = new ArrayList<String>();
             List<String> tag = new ArrayList<String>();
-            List<String> tags = new ArrayList<String>();
             
-            System.out.println("aaaaaaaa: " +name +" aaaaaaaaaaaaa \n");
             for (int i=0; i<commits;i++){
             	bw.write("<tr>");
             	line = outputid.split("\n")[i];
@@ -85,7 +83,6 @@ public class BranchReport {
              		line=line.replaceFirst(" ", "");
              	}
                 date.add(line);
-                System.out.println("Number of total branch commits is LALLALALA: "+name +" \n" +  date.get(i));
             	
             	// author
              
@@ -99,8 +96,7 @@ public class BranchReport {
                 // release - tag
                 
                 command = "cmd /C  git tag --contains "+id.get(i);
-                output = obj.executeCommand(command, path);
-                //output.split("/n");
+                output = obj.executeCommand(command, paths.get(0));
                 tag.add(output);
                 
                 line = tag.get(i).replace("\n", " / ");
@@ -116,43 +112,15 @@ public class BranchReport {
             	bw.write("</tr>");
             }
             
-           
-            System.out.println("\nOLA GOOD (oxi)");
-
             bw.write("</table>");
             bw.write("</body>");
             bw.write("</html>");
 
-            //br.close();
             bw.close();
         } catch (IOException ignored) {
 
         }
 
     }
-
-    private String executeCommand(String command, String arg) {
-
-        StringBuilder output = new StringBuilder();
-
-        Process p;
-        try {
-            p = Runtime.getRuntime().exec(command, null, new File(arg));
-            p.waitFor();
-            //System.out.println(p.exitValue());
-            BufferedReader reader =
-                    new BufferedReader(new InputStreamReader(p.getInputStream()));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                output.append(line+'\n');
-            }
-            p.destroy();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        
-        return output.toString();
-    }
-
     
 }

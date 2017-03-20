@@ -14,7 +14,7 @@ public class MainReport {
             return;
         }
         
-        System.out.println("Total number of lines in the file are: " + " \n "+ args[0] + " \n " + args[1]);
+        System.out.println("Our paths are: " + " \n "+ args[0] + " \n " + args[1]);
 
         try {
             File f = new File(args[1] + "/MainReport.htm");
@@ -50,7 +50,7 @@ public class MainReport {
             
             
             //command = "git diff --stat 4b825dc642cb6eb9a060e54bf8d69288fbee4904";
-            command = "cmd /C git ls-files | xargs wc -l";
+            command = "cmd /C git ls-files | xargs wc -l | tail -1";
             output = obj.executeCommand(command, args[0]);
             System.out.println("Number of total lines is: \n" +  totalLines(output)+ "\n") ;
             bw.write("<tr><th>Number of total lines</th><td>" + totalLines(output)+ "</td></tr>");
@@ -85,47 +85,21 @@ public class MainReport {
             
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
             
-            /*
-            for (int i = 0; i < commiters_count; i++) {
-            	command = "cmd /C  git log | grep Author: | sort | uniq | cut -d ' ' -f 2";
-                output = obj.executeCommand(command, args[0]);
-                commiters.add((output.split("\n")[i]));
-                //System.out.println(output.split("\n")[i]);
-			}
-            
-            for (String item:commiters) {
-            	System.out.println(item);
-            }
-            
-            //git log --author="Jon" | grep Author: | wc -l
-            for (String item:commiters) {
-            	command = "git log --author=\""+item+"\" | grep Author: | wc -l";
-                output = obj.executeCommand(command, args[0]);
-                System.out.println(item+" : "+ output);		//<--- Den trexei ...
-            }
-            */
-
-            
-            System.out.println("\nOLA GOOD (oxi)");
-
-           
             //git shotlog -sn --all | cut -f 1  <---
             //git shotlog -sn --all | cut -f 2
-            
-            
-            /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/  //Tha xreiastei gia onomasia branches
-            
-            /*command = "cmd /C git for-each-ref --sort=-committerdate refs/heads/";
-            output = obj.executeCommand(command,args[0]);
-            System.out.println("Number of commits per User: \n" +  output);
-            //bw.write("<tr><th>Number of commits per User</th><th>" + output+ "</th></tr>");*/
-            
-            
+
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
             
             List<String> commiters = new ArrayList<String>();
-            commiters =createCommitersTable(output,bw, args[0], args[1] , commiters_count, commits, obj);
-            createBranchTable(numBranches,bw, args[0], args[1], obj);
+            List<String> paths = new ArrayList<String>();
+            paths.add(args[0]);
+            paths.add(args[1]);
+            
+            bw.write("</table>");
+            List<String> brname = createBranchTable(numBranches,bw, paths, obj);
+            
+            commiters =createCommitersTable(bw, paths,brname, commiters_count, commits, obj);
+            
             System.out.println("\n--------------------------------------");
             
             
@@ -140,14 +114,14 @@ public class MainReport {
 
     }
 
-    private String executeCommand(String command, String path) {
+    public String executeCommand(String command, String path) {
 
         StringBuilder output = new StringBuilder();
 
         Process p;
         try {
             p = Runtime.getRuntime().exec(command, null, new File(path));
-            p.waitFor();
+            
             //System.out.println(p.exitValue());
             BufferedReader reader =
                     new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -155,6 +129,7 @@ public class MainReport {
             while ((line = reader.readLine()) != null) {
                 output.append(line+'\n');
             }
+            p.waitFor();
             p.destroy();
         } catch (Exception e) {
             e.printStackTrace();
@@ -174,12 +149,56 @@ public class MainReport {
 		return parts[1];
     }
     
-    
-    private static List<String> createCommitersTable(String out, BufferedWriter bw, String path, String path2, int commiters_count, int commits, MainReport obj) throws IOException {
-    	String s,command;
-       
+    private static List<String> createBranchTable(int brnum, BufferedWriter bw, List<String> paths , MainReport obj) throws IOException{
+	    bw.write("<br>");
+	    bw.write("<h2><font color = \"red\"> Branches </font></h2>");
+    	bw.write("<br>");
+    	bw.write("<table bgcolor=\"#FFFFFF\" style=\"width:15%\">");
+    	bw.write("<tr><th>Name</th><th>Date of Creation</th><th>Last Date of Modification</th></tr>");
+    	
+    	String com, out;
+    	ArrayList<String> date = new ArrayList<>();
+    	ArrayList<String> auth = new ArrayList<>(); //TODO OR NOT TODO
+    	ArrayList<String> br = new ArrayList<>();
+    	for (int i=0; i<brnum;i++){
+    		com = "git for-each-ref --sort=-committerdate refs/heads/ --format=%(committerdate:short),%(authorname),%(refname:short)";
+         	out = obj.executeCommand(com, paths.get(0));
+         	out = out.split("\n")[i];
+         	
+         	date.add(out.split(",")[0]);
+         	auth.add(out.split(",")[1]);
+         	br.add(out.split(",")[2]);
+         	
+         	BranchReport.create(paths, br.get(i),obj);
+         	
+    		bw.write("<tr>");
+    		bw.write("<td><a target=\"_blank\" href="+paths.get(1)+"/branchReports/"+br.get(i)+".htm>" + br.get(i)+ "</a></td>");
+    	    		
+    		if(br.get(i).equals("master")) {
+    			com = "cmd /C git log master --date=format:%Y-%m-%d | grep Date: | tail -1";
+    		}
+    		else {
+    			com = "cmd /C git log master..."+br.get(i)+" --date=format:%Y-%m-%d | grep Date: | tail -1";
+    		}
+    		
+    		out = obj.executeCommand(com, paths.get(0));
+    		
+    		out = out.replace("Date:", "");
+    		out = out.replaceAll(" ", "");
+    		
+    		bw.write("<td>"+out+"</td>");  
+    		
+    		bw.write("<td>"+date.get(i)+"</td>");
+
+        	bw.write("</tr>");
+    	}
     	bw.write("</table>");
-        
+    	return br;
+    } 
+    
+    private static List<String> createCommitersTable(BufferedWriter bw, List<String> paths,List<String> brname, int commiters_count, int commits, MainReport obj) throws IOException {
+    	String s,command,out;
+       
         bw.write("<br>");
 	    bw.write("<h2><font color = \"red\"> Commiters </font></h2>");
     	bw.write("<br>");
@@ -190,7 +209,7 @@ public class MainReport {
         List<String> commiters = new ArrayList<String>();
         for (int i = 0; i < commiters_count; i++) {
          	command = "cmd /C  git shortlog -sne --all";
-         	out = obj.executeCommand(command, path);
+         	out = obj.executeCommand(command, paths.get(0));
          	
             
          	s = out.split("\n")[i];
@@ -199,76 +218,21 @@ public class MainReport {
          	}
 
          	commiters.add((s.split("\t")[1]).split("<")[0]);
-         	//c[0] = Integer.valueOf(s.split("\t")[0]);
-         	System.out.println("--> "+ s.split("\t")[0]);
-         	System.out.println("--> "+ s.split("\t")[1]);
-         	System.out.println("--> "+ (Float.valueOf(s.split("\t")[0])/commits)*100 + "%");
          	
          	String name =commiters.get(i).replace(" ","");
-         	CommitersReport.create(path2,name );
+         	
+         	CommitersReport.create(paths,brname,name,obj );
+         	
          	bw.write("<tr>");
-         	System.out.println("23222222 --> "+ i +" <--s->>"+name+"<---");
-         	bw.write("<td><a target=\"_blank\" href="+path2+"/userReports/"+name+".htm>" + s.split("\t")[1] + "</a></td>");
+         	
+         	bw.write("<td><a target=\"_blank\" href="+paths.get(1)+"/userReports/"+name+".htm>" + s.split("\t")[1] + "</a></td>");
          	bw.write("<td> "+ s.split("\t")[0] +"</td>");
          	bw.write("<td>" + (Float.valueOf(s.split("\t")[0])/commits)*100 + "%</td>");
          	bw.write("<tr>");	
-         	System.out.println("asdasdasdas --> "+ i +" <--s->>"+commiters.get(i));	
         }
         bw.write("</table>");
         return commiters;
     }
     
-    
-     private static void createBranchTable(int brnum, BufferedWriter bw, String path, String path2, MainReport obj) throws IOException{
-	    bw.write("<br>");
-	    bw.write("<h2><font color = \"red\"> Branches </font></h2>");
-    	bw.write("<br>");
-    	bw.write("<table bgcolor=\"#FFFFFF\" style=\"width:15%\">");
-    	bw.write("<tr><th>Name</th><th>Date of Creation</th><th>Last Date of Modification</th></tr>");
-    	
-    	String com, out;
-    	ArrayList<String> date = new ArrayList<>();
-    	ArrayList<String> auth = new ArrayList<>();
-    	ArrayList<String> br = new ArrayList<>();
-    	for (int i=0; i<brnum;i++){
-    		com = "git for-each-ref --sort=-committerdate refs/heads/ --format=%(committerdate:short),%(authorname),%(refname:short)";
-         	out = obj.executeCommand(com, path);
-         	out = out.split("\n")[i];
-         	
-         	date.add(out.split(",")[0]);
-         	auth.add(out.split(",")[1]);
-         	br.add(out.split(",")[2]);
-         	//System.out.println("AAAAA -->"+ date.get(i) + " " + auth.get(i) + " " + br.get(i));
-         	BranchReport.create(path2, br.get(i));
-         	
-    		bw.write("<tr>");
-    		bw.write("<td><a target=\"_blank\" href="+path2+"/branchReports/"+br.get(i)+".htm>" + br.get(i)+ "</a></td>");
-    		//bw.write("<td> <a target=\"_blank\" href= \"BranchReport.htm\" >"+br+"</a></td>");
-    		
-    		
-    		// git log <br>...<br> --date=format:%Y-%m-%d,%H:%M:%S | grep Date: | tail -1
-    		
-    		if(br.get(i).equals("master")) {
-    			com = "cmd /C git log master --date=format:%Y-%m-%d | grep Date: | tail -1";
-    		}
-    		else {
-    			com = "cmd /C git log master..."+br.get(i)+" --date=format:%Y-%m-%d | grep Date: | tail -1";
-    		}
-    		
-    		out = obj.executeCommand(com, path);
-    		
-    		out = out.replace("Date:", "");
-    		out = out.replaceAll(" ", "");
-    		System.out.println("EDWWWWW -->"+out);
-    		
-    		bw.write("<td>"+out+"</td>");  
-    		
-    		bw.write("<td>"+date.get(i)+"</td>");
-
-        	bw.write("</tr>");
-    	}
-    	bw.write("</table>");
-    	
-    } 
     
 }
