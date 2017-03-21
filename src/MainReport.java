@@ -24,7 +24,7 @@ public class MainReport {
             bw.write("<title> Exercise-1 </title>");
             bw.write("<style>table, th, td {border: 1px solid black; border-collapse: collapse; white-space: nowrap;}th, td { padding: 5px; text-align: left; }</style>");
             bw.write("</head> <body bgcolor=\"#fcf5ef\" >");
-            bw.write("<h2><font color = \"red\"> Report for </font> <a target=\"_blank\" href=\""+ args[1] +"\"> Git repository </a></h2>");
+            bw.write("<h2><font color = \"red\"> Report for </font> <a target=\"_blank\" href=\""+ args[0] +"\"> Git repository </a></h2>");
             bw.write("<table bgcolor=\"#FFFFFF\" style=\"width:15%\">");
             
             MainReport obj = new MainReport();
@@ -96,9 +96,9 @@ public class MainReport {
             paths.add(args[1]);
             
             bw.write("</table>");
-            List<String> brname = createBranchTable(numBranches,bw, paths, obj);
+            List<String> brnames = createBranchTable(numBranches,bw, paths,commits, obj);
             
-            commiters =createCommitersTable(bw, paths,brname, commiters_count, commits, obj);
+            commiters =createCommitersTable(bw, paths,brnames, commiters_count, commits, obj);
             
             System.out.println("\n--------------------------------------");
             
@@ -149,54 +149,62 @@ public class MainReport {
 		return parts[1];
     }
     
-    private static List<String> createBranchTable(int brnum, BufferedWriter bw, List<String> paths , MainReport obj) throws IOException{
+    private static List<String> createBranchTable(int brnum, BufferedWriter bw, List<String> paths ,int commits, MainReport obj) throws IOException{
 	    bw.write("<br>");
 	    bw.write("<h2><font color = \"red\"> Branches </font></h2>");
     	bw.write("<br>");
     	bw.write("<table bgcolor=\"#FFFFFF\" style=\"width:15%\">");
-    	bw.write("<tr><th>Name</th><th>Date of Creation</th><th>Last Date of Modification</th></tr>");
+    	bw.write("<tr><th>Name</th><th>Date of Creation</th><th>Last Date of Modification</th><th>Percentage of Commits</th></tr>");
     	
-    	String com, out;
+    	String command, output;
+    	int brcommits;
+    	
     	ArrayList<String> date = new ArrayList<>();
     	ArrayList<String> auth = new ArrayList<>(); //TODO OR NOT TODO
-    	ArrayList<String> br = new ArrayList<>();
+    	ArrayList<String> brnames = new ArrayList<>();
     	for (int i=0; i<brnum;i++){
-    		com = "git for-each-ref --sort=-committerdate refs/heads/ --format=%(committerdate:short),%(authorname),%(refname:short)";
-         	out = obj.executeCommand(com, paths.get(0));
-         	out = out.split("\n")[i];
+    		command = "git for-each-ref --sort=-committerdate refs/heads/ --format=%(committerdate:short),%(authorname),%(refname:short)";
+    		output = obj.executeCommand(command, paths.get(0));
+    		output = output.split("\n")[i];
          	
-         	date.add(out.split(",")[0]);
-         	auth.add(out.split(",")[1]);
-         	br.add(out.split(",")[2]);
+         	date.add(output.split(",")[0]);
+         	auth.add(output.split(",")[1]);
+         	brnames.add(output.split(",")[2]);
          	
-         	BranchReport.create(paths, br.get(i),obj);
+         	command = "cmd /C  git log "+brnames.get(i)+" --oneline | wc -l";
+            output = obj.executeCommand(command, paths.get(0));
+            brcommits = Integer.valueOf(output.substring(0, output.length()-1));
+            
+         	BranchReport.create(paths, brnames.get(i), brcommits ,obj);
          	
     		bw.write("<tr>");
-    		bw.write("<td><a target=\"_blank\" href="+paths.get(1)+"/branchReports/"+br.get(i)+".htm>" + br.get(i)+ "</a></td>");
+    		bw.write("<td><a target=\"_blank\" href="+paths.get(1)+"/branchReports/"+brnames.get(i)+".htm>" + brnames.get(i)+ "</a></td>");
     	    		
-    		if(br.get(i).equals("master")) {
-    			com = "cmd /C git log master --date=format:%Y-%m-%d | grep Date: | tail -1";
+    		if(brnames.get(i).equals("master")) {
+    			command = "cmd /C git log master --date=format:%Y-%m-%d | grep Date: | tail -1";
     		}
     		else {
-    			com = "cmd /C git log master..."+br.get(i)+" --date=format:%Y-%m-%d | grep Date: | tail -1";
+    			command = "cmd /C git log master..."+brnames.get(i)+" --date=format:%Y-%m-%d | grep Date: | tail -1";
     		}
     		
-    		out = obj.executeCommand(com, paths.get(0));
+    		output = obj.executeCommand(command, paths.get(0));
     		
-    		out = out.replace("Date:", "");
-    		out = out.replaceAll(" ", "");
+    		output = output.replace("Date:", "");
+    		output = output.replaceAll(" ", "");
     		
-    		bw.write("<td>"+out+"</td>");  
+    		bw.write("<td>"+output+"</td>");  
     		
     		bw.write("<td>"+date.get(i)+"</td>");
+    		
+    		bw.write("<td>"+String.format("%.02f", Float.valueOf(brcommits)*100/commits)+"%</td>");
 
         	bw.write("</tr>");
     	}
     	bw.write("</table>");
-    	return br;
+    	return brnames;
     } 
     
-    private static List<String> createCommitersTable(BufferedWriter bw, List<String> paths,List<String> brname, int commiters_count, int commits, MainReport obj) throws IOException {
+    private static List<String> createCommitersTable(BufferedWriter bw, List<String> paths,List<String> brnames, int commiters_count, int commits, MainReport obj) throws IOException {
     	String s,command,out;
        
         bw.write("<br>");
@@ -219,15 +227,16 @@ public class MainReport {
 
          	commiters.add((s.split("\t")[1]).split("<")[0]);
          	
-         	String name =commiters.get(i).replace(" ","");
+         	String name =commiters.get(i);
+         	name = name.substring(0,name.length()-1);
          	
-         	CommitersReport.create(paths,brname,name,obj );
+         	CommitersReport.create(paths,brnames,name,obj );
          	
          	bw.write("<tr>");
          	
-         	bw.write("<td><a target=\"_blank\" href="+paths.get(1)+"/userReports/"+name+".htm>" + s.split("\t")[1] + "</a></td>");
+         	bw.write("<td><a target=\"_blank\" href="+paths.get(1)+"/userReports/"+name.replace(" ","")+".htm>" + s.split("\t")[1] + "</a></td>");
          	bw.write("<td> "+ s.split("\t")[0] +"</td>");
-         	bw.write("<td>" + (Float.valueOf(s.split("\t")[0])/commits)*100 + "%</td>");
+         	bw.write("<td>" + String.format("%.02f", Float.valueOf(s.split("\t")[0])*100/commits) + "%</td>");
          	bw.write("<tr>");	
         }
         bw.write("</table>");

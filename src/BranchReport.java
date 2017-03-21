@@ -7,7 +7,7 @@ import java.util.List;
 public class BranchReport {
 
 
-    public static void create(List <String> paths, String name, MainReport obj) {
+    public static void create(List <String> paths, String name, int commits ,MainReport obj) {
 
         try {
         	File myDir = new File(paths.get(1) , "branchReports");
@@ -36,16 +36,16 @@ public class BranchReport {
             
             String command,output,outputauthor,outputdate,outputid;
 
-            int commits=0;
+            //int commits=0;
             
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
             
-            command = "cmd /C  git log "+name+" --oneline | wc -l";
+            /*command = "cmd /C  git log "+name+" --oneline | wc -l";
             output = obj.executeCommand(command, paths.get(0));
-            commits = Integer.valueOf(output.substring(0, output.length()-1));
+            commits = Integer.valueOf(output.substring(0, output.length()-1));*/
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
             
-            System.out.println("Number of total branch -> " + name +  " commits is: \n" +  output);
+            System.out.println("Number of total branch -> " + name +  " commits is: \n" +  commits);
            
             command = "cmd /C git log "+name+" --oneline | cat";
             outputid = obj.executeCommand(command, paths.get(0));

@@ -7,7 +7,7 @@ import java.util.List;
 public class CommitersReport {
 
 
-    public static void create(List <String> paths, List<String> brname ,String name, MainReport obj) {
+    public static void create(List <String> paths, List<String> brname ,String name ,MainReport obj) {
 
         try {
         	File myDir = new File(paths.get(1) , "userReports");
@@ -21,7 +21,7 @@ public class CommitersReport {
         	        System.out.println("DIR created");  
         	    }
         	}
-            File f = new File(myDir, name+".htm");
+            File f = new File(myDir, name.replace(" ","") +".htm");
 
             System.out.println("--->"+f.getAbsolutePath()+"<---");
             
@@ -39,9 +39,10 @@ public class CommitersReport {
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
             
             String command,output;
+            String[] line;
+			int usercom=0;
             
             for (int i = 0; i < brname.size(); i++) {
-				System.out.println("AXNEEEEEEEE " + brname.get(i));
 				bw.write("<tr>");
 				
 				command = "cmd /C  git log "+ brname.get(i) +" --oneline | wc -l";
@@ -50,11 +51,21 @@ public class CommitersReport {
 	            int commits = Integer.valueOf(output.substring(0, output.length()-1));
 	            
 	            
+	            command = "cmd /C git log "+brname.get(i) +" | grep Author: | cat";
+	            output = obj.executeCommand(command, paths.get(0));
+	            line = output.split("\n");
+	            for (int j = 0; j < line.length; j++) {
+	            	if(line[j].contains(name))
+	                	usercom++;
+				}
+                
+                System.out.println("USERCOM: "+ usercom + "name "+ name +" AXNEEE \n" +  output);
+	            
 	            bw.write("<td> "+ brname.get(i) +"</td>");
 	            bw.write("<td> "+ commits +"</td>");
-	            bw.write("<td> "+ name +"</td>");
-
+	            bw.write("<td> "+ String.format("%.02f", Float.valueOf(usercom)*100/commits) +"%</td>");	    
 	            bw.write("</tr>");
+	            usercom=0;
 			}
             
             
