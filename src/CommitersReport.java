@@ -21,11 +21,11 @@ public class CommitersReport {
         	        System.out.println("DIR created");  
         	    }
         	}
-            File f = new File(myDir, name.replace(" ","") +".htm");
+            File f = new File(myDir, name +".htm");
 
             System.out.println("--->"+f.getAbsolutePath()+"<---");
             
-            BufferedWriter bw = new BufferedWriter(new FileWriter(f));
+            BufferedWriter bw = new BufferedWriter(new FileWriter(f.getAbsolutePath()));
             bw.write("<html>");
             bw.write("<head>");
             bw.write("<title> "+name+" </title>");
@@ -55,7 +55,7 @@ public class CommitersReport {
 	            output = obj.executeCommand(command, paths.get(0));
 	            line = output.split("\n");
 	            for (int j = 0; j < line.length; j++) {
-	            	if(line[j].split("<")[0].contains(name))
+	            	if(line[j].replaceAll(" ","").replaceAll("<","(").replaceAll(">",")").contains(name))
 	                	usercom++;
 				}
                 

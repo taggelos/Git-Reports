@@ -215,7 +215,7 @@ public class MainReport {
     	
         List<String> commiters = new ArrayList<String>();
         for (int i = 0; i < commiters_count; i++) {
-         	command = "cmd /C  git shortlog -sn --all";
+         	command = "cmd /C git shortlog -sne --all";
          	out = obj.executeCommand(command, paths.get(0));
          	
             
@@ -224,7 +224,7 @@ public class MainReport {
          		s=s.replaceFirst(" ", "");
          	}
 
-         	commiters.add(s.split("\t")[1]);
+         	commiters.add(s.split("\t")[1].replaceAll(" ","").replaceAll("<","(").replaceAll(">",")"));
          	
          	String name =commiters.get(i);
          	
@@ -232,7 +232,7 @@ public class MainReport {
          	
          	bw.write("<tr>");
          	
-         	bw.write("<td><a target=\"_blank\" href="+paths.get(1)+"/userReports/"+name.replace(" ","")+".htm>" + s.split("\t")[1] + "</a></td>");
+         	bw.write("<td><a target=\"_blank\" href="+paths.get(1)+"/userReports/"+name+".htm>" + name + "</a></td>");
          	bw.write("<td> "+ s.split("\t")[0] +"</td>");
          	bw.write("<td>" + String.format("%.02f", Float.valueOf(s.split("\t")[0])*100/commits) + "%</td>");
          	bw.write("<tr>");	
