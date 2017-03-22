@@ -68,7 +68,7 @@ public class MainReport {
             bw.write("<tr><th>Number of total tags</th><td>" + output+ "</td></tr>");
             
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-            command = "cmd /C  git log | findstr Author: | sort | uniq | wc -l";
+            command = "cmd /C git shortlog -sn --all | wc -l";
             output = obj.executeCommand(command, args[0]);
             System.out.println("Number of total committers is: \n" +  output);
             bw.write("<tr><th>Number of total committers</th><td>" + output+ "</td></tr>");
@@ -215,7 +215,7 @@ public class MainReport {
     	
         List<String> commiters = new ArrayList<String>();
         for (int i = 0; i < commiters_count; i++) {
-         	command = "cmd /C  git shortlog -sn --all";
+         	command = "cmd /C git shortlog -sn --all";
          	out = obj.executeCommand(command, paths.get(0));
          	
             
@@ -232,7 +232,7 @@ public class MainReport {
          	
          	bw.write("<tr>");
          	
-         	bw.write("<td><a target=\"_blank\" href="+paths.get(1)+"/userReports/"+name.replace(" ","")+".htm>" + s.split("\t")[1] + "</a></td>");
+         	bw.write("<td><a target=\"_blank\" href="+paths.get(1)+"/userReports/"+name.replace(" ", "")+".htm>" + name + "</a></td>");
          	bw.write("<td> "+ s.split("\t")[0] +"</td>");
          	bw.write("<td>" + String.format("%.02f", Float.valueOf(s.split("\t")[0])*100/commits) + "%</td>");
          	bw.write("<tr>");	
