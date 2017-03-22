@@ -47,14 +47,14 @@ public class BranchReport {
             
             System.out.println("Number of total branch -> " + name +  " commits is: \n" +  commits);
            
-            command = "cmd /C git log "+name+" --oneline | cat";
+            command = "cmd /C git log "+name+" --oneline";
             outputid = obj.executeCommand(command, paths.get(0));
             
             
-            command = "cmd /C git log "+name +" --date=format:%Y-%m-%d | grep Date: | cat ";
+            command = "cmd /C git log "+name +" --date=format:%Y-%m-%d | grep Date:";
             outputdate = obj.executeCommand(command, paths.get(0));
             
-            command = "cmd /C git log "+name +" | grep Author: | cat";
+            command = "cmd /C git log "+name +" | grep Author:";
             outputauthor = obj.executeCommand(command, paths.get(0));
             
             

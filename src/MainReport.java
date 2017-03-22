@@ -49,7 +49,6 @@ public class MainReport {
             bw.write("<tr><th>Number of files</th><td>"+ output+ "</td></tr>");
             
             
-            //command = "git diff --stat 4b825dc642cb6eb9a060e54bf8d69288fbee4904";
             command = "cmd /C git ls-files | xargs wc -l | tail -1";
             output = obj.executeCommand(command, args[0]);
             System.out.println("Number of total lines is: \n" +  totalLines(output)+ "\n") ;
@@ -216,7 +215,7 @@ public class MainReport {
     	
         List<String> commiters = new ArrayList<String>();
         for (int i = 0; i < commiters_count; i++) {
-         	command = "cmd /C  git shortlog -sne --all";
+         	command = "cmd /C  git shortlog -sn --all";
          	out = obj.executeCommand(command, paths.get(0));
          	
             
@@ -225,10 +224,9 @@ public class MainReport {
          		s=s.replaceFirst(" ", "");
          	}
 
-         	commiters.add((s.split("\t")[1]).split("<")[0]);
+         	commiters.add(s.split("\t")[1]);
          	
          	String name =commiters.get(i);
-         	name = name.substring(0,name.length()-1);
          	
          	CommitersReport.create(paths,brnames,name,obj );
          	
