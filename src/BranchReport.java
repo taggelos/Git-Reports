@@ -27,12 +27,12 @@ public class BranchReport {
             bw.write("<html>");
             bw.write("<head>");
             bw.write("<title> "+name+" </title>");
-            bw.write("<style>table, th, td {border: 1px solid black; border-collapse: collapse; white-space: nowrap;}th, td { padding: 10px; text-align: left; }</style>");
-            bw.write("</head> <body bgcolor=\"#fcf5ef\" >");
-            bw.write("<h2><font color = \"blue\">" + name + "</font><font color = \"red\"> Branch Report </font> </h2>");
-            bw.write("<table bgcolor=\"#FFFFFF\" style=\"width:15%\">");
+            bw.write("<link rel=\"stylesheet\" type=\"text/css\" href=\"" +paths.get(0) +"/mystyle.css\">");
+            bw.write("</head> <body class = \"body\" >");
+            bw.write("<br><div class = \"title\">" + name + "</font><font color = \"red\"> Branch Report </div>");
+            bw.write("<br><table class = \"table\">");
             
-            bw.write("<tr><th>Id</th><th>Message</th><th>Date</th><th>Author</th><th>Release</th>");
+            bw.write("<tr><th class = \"th\">Id</th><th class = \"th\">Message</th><th class = \"th\" >Date</th><th class = \"th\" >Author</th><th class = \"th\">Release</th>");
             
             String command,output,outputauthor,outputdate,outputid;
 
@@ -104,11 +104,11 @@ public class BranchReport {
                 	line = line.substring(0, line.length()-2);
             	
             	System.out.println("line:" + line + " id-> " + id.get(i) + " tag ->" + tag.get(i)+" \n");
-            	bw.write("<td>" + id.get(i) +" </td>"  );
-            	bw.write("<td>" + msg.get(i) +" </td>"  );
-            	bw.write("<td>" + date.get(i) +" </td>"  );
-            	bw.write("<td>" + author.get(i) +" </td>"  );
-            	bw.write("<td>" + line +" </td>"  );
+            	bw.write("<td class = \"td\">" + id.get(i) +" </td>"  );
+            	bw.write("<td class = \"td\">" + msg.get(i) +" </td>"  );
+            	bw.write("<td class = \"td\">" + date.get(i) +" </td>"  );
+            	bw.write("<td class = \"td\">" + author.get(i) +" </td>"  );
+            	bw.write("<td class = \"td\">" + line +" </td>"  );
             	bw.write("</tr>");
             }
             

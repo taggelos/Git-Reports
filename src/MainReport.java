@@ -1,6 +1,4 @@
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,15 +15,16 @@ public class MainReport {
         System.out.println("Our paths are: " + " \n "+ args[0] + " \n " + args[1]);
 
         try {
+        	CreateCssFile(args[1]);
             File f = new File(args[1] + "/MainReport.htm");
             BufferedWriter bw = new BufferedWriter(new FileWriter(f));
             bw.write("<html>");
             bw.write("<head>");
             bw.write("<title> Exercise-1 </title>");
-            bw.write("<style>table, th, td {border: 1px solid black; border-collapse: collapse; white-space: nowrap;}th, td { padding: 5px; text-align: left; }</style>");
-            bw.write("</head> <body bgcolor=\"#fcf5ef\" >");
-            bw.write("<h2><font color = \"red\"> Report for  <a target=\"_blank\" href=\""+ args[0] +"\"> "+args[0].substring(args[0].lastIndexOf("\\")+1)+"</a> repository </font></h2>");
-            bw.write("<table bgcolor=\"#FFFFFF\" style=\"width:15%\">");
+            bw.write("<link rel=\"stylesheet\" type=\"text/css\" href=\"" +args[1] +"/mystyle.css\">");
+            bw.write("</head> <body class = \"body\">");
+            bw.write("<br><div class = \"title\"> Report for  <a class = \"link\" href=\""+ args[0] +"\"> "+args[0].substring(args[0].lastIndexOf("\\")+1)+"</a> repository </div>");
+            bw.write("<br><br><table class= \"table\">");
             
             MainReport obj = new MainReport();
 
@@ -46,32 +45,32 @@ public class MainReport {
             //System.out.println(System.getProperty("user.dir"));
 
             System.out.println("Number of files is: \n" +  output);
-            bw.write("<tr><th>Number of files</th><td>"+ output+ "</td></tr>");
+            bw.write("<tr><th class=\"th\">Number of files</th><td class = \"td\">"+ output+ "</td></tr>");
             
             
             command = "cmd /C git ls-files | xargs wc -l | tail -1";
             output = obj.executeCommand(command, args[0]);
             System.out.println("Number of total lines is: \n" +  totalLines(output)+ "\n") ;
-            bw.write("<tr><th>Number of total lines</th><td>" + totalLines(output)+ "</td></tr>");
+            bw.write("<tr><th class=\"th\">Number of total lines</th><td class = \"td\">" + totalLines(output)+ "</td></tr>");
             
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
             command = "cmd /C git branch | wc -l";
             output = obj.executeCommand(command, args[0]);
             int numBranches = Integer.parseInt(output.replace("\n", ""));
             System.out.println("Number of total branches is: \n" +  numBranches);
-            bw.write("<tr><th>Number of total branches</th><td>" + numBranches+ "</td></tr>");
+            bw.write("<tr><th class=\"th\">Number of total branches</th><td class = \"td\">" + numBranches+ "</td></tr>");
             
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
             command = "cmd /C git tag | wc -l";
             output = obj.executeCommand(command, args[0]);
             System.out.println("Number of total tags is: \n" +  output);
-            bw.write("<tr><th>Number of total tags</th><td>" + output+ "</td></tr>");
+            bw.write("<tr><th class=\"th\">Number of total tags</th><td class = \"td\">" + output+ "</td></tr>");
             
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
             command = "cmd /C git shortlog -sn --all | wc -l";
             output = obj.executeCommand(command, args[0]);
             System.out.println("Number of total committers is: \n" +  output);
-            bw.write("<tr><th>Number of total committers</th><td>" + output+ "</td></tr>");
+            bw.write("<tr><th class=\"th\">Number of total committers</th><td class = \"td\">" + output+ "</td></tr>");
             commiters_count = Integer.valueOf(output.substring(0, output.length()-1));
           
             
@@ -79,7 +78,7 @@ public class MainReport {
             command = "cmd /C  git log | findstr Author: | sort | wc -l";
             output = obj.executeCommand(command, args[0]);
             System.out.println("Number of total commits is: \n" +  output);
-            bw.write("<tr><th>Number of total commits</th><td>" + output+ "</td></tr>");
+            bw.write("<tr><th class=\"th\">Number of total commits</th><td class = \"td\">" + output+ "</td></tr>");
             commits = Integer.valueOf(output.substring(0, output.length()-1));
             
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -94,18 +93,17 @@ public class MainReport {
             paths.add(args[0]);
             paths.add(args[1]);
             
-            bw.write("</table>");
+            bw.write("</table><br>");
             List<String> brnames = createBranchTable(numBranches,bw, paths,commits, obj);
             
             commiters =createCommitersTable(bw, paths,brnames, commiters_count, commits, obj);
             
             System.out.println("\n--------------------------------------");
             
-            
+            bw.write("<div class = \"text\"> <p>&copy; 2017 <p> </div>");
             bw.write("</body>");
             bw.write("</html>");
 
-            //br.close();
             bw.close();
         } catch (IOException ignored) {
 
@@ -113,7 +111,30 @@ public class MainReport {
 
     }
 
-    public String executeCommand(String command, String path) {
+    
+    
+    
+    private static void CreateCssFile(String path) throws IOException {
+    	File f = new File(path + "/mystyle.css");
+        BufferedWriter bw = new BufferedWriter(new FileWriter(f));
+        bw.write(".body {font-weight: 300;margin: 0;background-color: #fcf5ef;color: #fff;text-align: center;}");
+        bw.write(".table {text-align: left;font-size: 20px;color: white;max-width: 340px;margin: 0 auto;top: 80px;border-radius: 5px;box-shadow: 0 5px 50px rgba(0,0,0,2);}");
+        bw.write(".th{background-color: #555555;color: white;margin-top: 0;border-radius: 5px 5px 0 0;white-space: nowrap;}");
+        bw.write(".title{font-family:courier;font-weight: bold;text-align: right;font-size: 28px;text-align: center;color: #555555;}");
+        bw.write(".td{background-color: white;color: black;text-align: center;margin-top: 0;border-radius: 5px 5px 0 0;	white-space: nowrap;}");
+        bw.write(".td:hover{background-color: yellow;margin-top: 0;}");
+        bw.write(".a{font-style: italic;}");
+        bw.write(".a:hover{background-color: orange;}");
+        bw.write(".link:visited {text-decoration: none;}");
+        bw.write(".link:link {text-decoration: none;}");
+        bw.write(".link:hover {text-decoration: underline;}");
+        bw.write(".link:active {text-decoration: underline;}");
+        bw.write(".text{position: absolute; bottom: 0; right: 0; width: 100px; text-align:center;color: #555555 ; font-style: bold;}");
+        bw.close();
+	}
+
+
+	public String executeCommand(String command, String path) {
 
         StringBuilder output = new StringBuilder();
 
@@ -149,11 +170,10 @@ public class MainReport {
     }
     
     private static List<String> createBranchTable(int brnum, BufferedWriter bw, List<String> paths ,int commits, MainReport obj) throws IOException{
-	    bw.write("<br>");
-	    bw.write("<h2><font color = \"red\"> Branches </font></h2>");
-    	bw.write("<br>");
-    	bw.write("<table bgcolor=\"#FFFFFF\" style=\"width:15%\">");
-    	bw.write("<tr><th>Name</th><th>Date of Creation</th><th>Last Date of Modification</th><th>Percentage of Commits</th></tr>");
+	    bw.write("<br><br>");
+	    bw.write("<div class = \"title\"> Branches </div>");
+    	bw.write("<br><br><table class = \"table\"");
+    	bw.write("<tr><th class=\"th\">Name</th><th class=\"th\">Date of Creation</th><th class=\"th\" >Last Date of Modification</th><th class=\"th\">Percentage of Commits</th></tr>");
     	
     	String command, output;
     	int brcommits;
@@ -177,7 +197,7 @@ public class MainReport {
          	BranchReport.create(paths, brnames.get(i), brcommits ,obj);
          	
     		bw.write("<tr>");
-    		bw.write("<td><a target=\"_blank\" href="+paths.get(1)+"/branchReports/"+brnames.get(i)+".htm>" + brnames.get(i)+ "</a></td>");
+    		bw.write("<td class = \"a\"><a class = \"link\" href="+paths.get(1)+"/branchReports/"+brnames.get(i)+".htm>" + brnames.get(i)+ "</a></td>");
     	    		
     		if(brnames.get(i).equals("master")) {
     			command = "cmd /C git log master --date=format:%Y-%m-%d | grep Date: | tail -1";
@@ -191,26 +211,25 @@ public class MainReport {
     		output = output.replace("Date:", "");
     		output = output.replaceAll(" ", "");
     		
-    		bw.write("<td>"+output+"</td>");  
+    		bw.write("<td class = \"td\">"+output+"</td>");  
     		
-    		bw.write("<td>"+date.get(i)+"</td>");
+    		bw.write("<td class = \"td\">"+date.get(i)+"</td>");
     		
-    		bw.write("<td>"+String.format("%.02f", Float.valueOf(brcommits)*100/commits)+"%</td>");
+    		bw.write("<td class = \"td\">"+String.format("%.02f", Float.valueOf(brcommits)*100/commits)+"%</td>");
 
         	bw.write("</tr>");
     	}
-    	bw.write("</table>");
+    	bw.write("</table><br>");
     	return brnames;
     } 
     
     private static List<String> createCommitersTable(BufferedWriter bw, List<String> paths,List<String> brnames, int commiters_count, int commits, MainReport obj) throws IOException {
     	String s,command,out;
        
-        bw.write("<br>");
-	    bw.write("<h2><font color = \"red\"> Commiters </font></h2>");
-    	bw.write("<br>");
-    	bw.write("<table bgcolor=\"#FFFFFF\" style=\"width:15%\">");
-    	bw.write("<tr><th>Name</th><th>Number of commits</th><th>Percentage of Commits</th></tr>");
+        bw.write("<br><br>");
+	    bw.write("<div class = \"title\"> Commiters </div>");
+    	bw.write("<br><br><table class = \"table\"");
+    	bw.write("<tr><th class=\"th\">Name</th><th class=\"th\">Number of commits</th><th class=\"th\">Percentage of Commits</th></tr>");
     	
     	
         List<String> commiters = new ArrayList<String>();
@@ -232,9 +251,9 @@ public class MainReport {
          	
          	bw.write("<tr>");
          	
-         	bw.write("<td><a target=\"_blank\" href="+paths.get(1)+"/userReports/"+name.replace(" ", "")+".htm>" + name + "</a></td>");
-         	bw.write("<td> "+ s.split("\t")[0] +"</td>");
-         	bw.write("<td>" + String.format("%.02f", Float.valueOf(s.split("\t")[0])*100/commits) + "%</td>");
+         	bw.write("<td class = \"a\"><a class = \"link\" href="+paths.get(1)+"/userReports/"+name.replace(" ", "")+".htm>" + name + "</a></td>");
+         	bw.write("<td class = \"td\">"+ s.split("\t")[0] +"</td>");
+         	bw.write("<td class = \"td\">" + String.format("%.02f", Float.valueOf(s.split("\t")[0])*100/commits) + "%</td>");
          	bw.write("<tr>");	
         }
         bw.write("</table>");

@@ -29,12 +29,12 @@ public class CommitersReport {
             bw.write("<html>");
             bw.write("<head>");
             bw.write("<title> "+name+" </title>");
-            bw.write("<style>table, th, td {border: 1px solid black; border-collapse: collapse; white-space: nowrap;}th, td { padding: 5px; text-align: left; }</style>");
-            bw.write("</head> <body bgcolor=\"#fcf5ef\" >");
-            bw.write("<h2><font color = \"blue\">" + name + "</font><font color = \"red\"> Report </font> </h2>");
-            bw.write("<table bgcolor=\"#FFFFFF\" style=\"width:15%\">");
+            bw.write("<link rel=\"stylesheet\" type=\"text/css\" href=\"" +paths.get(0) +"/mystyle.css\">");
+            bw.write("</head> <body class = \"body\" >");
+            bw.write("<br><div class = \"title\">" + name + "</font><font color = \"red\"> Report </div>");
+            bw.write("<br><table class = \"table\">");
             
-            bw.write("<tr><th>Branch Name</th><th>Total Commits</th><th>Percentage of Commits</th>");
+            bw.write("<tr><th class = \"th\">Branch Name</th><th class = \"th\">Total Commits</th><th class = \"th\">Percentage of Commits</th>");
             
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
             
@@ -61,9 +61,9 @@ public class CommitersReport {
                 
                 System.out.println("USERCOM: "+ usercom + "name "+ name +" AXNEEE \n" +  output);
 	            
-	            bw.write("<td> "+ brname.get(i) +"</td>");
-	            bw.write("<td> "+ usercom +"</td>");
-	            bw.write("<td> "+ String.format("%.02f", Float.valueOf(usercom)*100/commits) +"%</td>");	    
+	            bw.write("<td class = \"td\"> "+ brname.get(i) +"</td>");
+	            bw.write("<td class = \"td\"> "+ usercom +"</td>");
+	            bw.write("<td class = \"td\"> "+ String.format("%.02f", Float.valueOf(usercom)*100/commits) +"%</td>");	    
 	            bw.write("</tr>");
 	            usercom=0;
 			}
@@ -71,26 +71,24 @@ public class CommitersReport {
             
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
             bw.write("</table>");
-            bw.write("<br>");
-            
-            bw.write("<h2><font color = \"red\"> Average Commits </font></h2>");
-        	bw.write("<br>");
-        	bw.write("<table bgcolor=\"#FFFFFF\" style=\"width:15%\">");
+            bw.write("<br><br><br>");            
+            bw.write("<div class = \"title\"> Average Commits </div>");
+
+        	bw.write("<br><br><table class = \"table\">");
         	
         	
             
-        	bw.write("<tr><th>per Day</th><td>"+ name + "</td></tr>");
-        	bw.write("<tr><th>per Week</th><td>"+ name + "</td></tr>");
-        	bw.write("<tr><th>per Month</th><td>"+ name + "</td></tr>");
+        	bw.write("<tr><th class = \"th\">per Day</th><td class = \"td\">"+ name + "</td></tr>");
+        	bw.write("<tr><th class = \"th\">per Week</th><td class = \"td\">"+ name + "</td></tr>");
+        	bw.write("<tr><th class = \"th\">per Month</th><td class = \"td\">"+ name + "</td></tr>");
         	
         	 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         	
         	bw.write("</table>");
-            bw.write("<br>");
+            bw.write("<br><br><br>");
             
-            bw.write("<h2><font color = \"red\"> Average Lines </font></h2>");
-        	bw.write("<br>");
-        	bw.write("<table bgcolor=\"#FFFFFF\" style=\"width:15%\">");
+            bw.write("<div class = \"title\"> Average Lines </div>");
+        	bw.write("<br><br><table class = \"table\">");
         	
         	command = "cmd /C git log --author=\""+name +"\" --pretty=tformat: --numstat | cut -f 1";
         	output = obj.executeCommand(command, paths.get(0));
@@ -122,9 +120,9 @@ public class CommitersReport {
         		total_rmv += Integer.valueOf(line[j]);
         	}
             
-        	bw.write("<tr><th>Added</th><td>"+ total_add + "</td></tr>");
-        	bw.write("<tr><th>Removed</th><td>"+ total_rmv + "</td></tr>");
-        	bw.write("<tr><th>Updated</th><td>"+ name + "</td></tr>");
+        	bw.write("<tr><th class = \"th\">Added</th><td class = \"td\">"+ total_add + "</td></tr>");
+        	bw.write("<tr><th class = \"th\">Removed</th><td class = \"td\">"+ total_rmv + "</td></tr>");
+        	bw.write("<tr><th class = \"th\">Updated</th><td class = \"td\">"+ name + "</td></tr>");
             
             bw.write("</table>");
             bw.write("</body>");
