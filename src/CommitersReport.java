@@ -29,7 +29,7 @@ public class CommitersReport {
             bw.write("<html>");
             bw.write("<head>");
             bw.write("<title> "+name+" </title>");
-            bw.write("<link rel=\"stylesheet\" type=\"text/css\" href=\"" +paths.get(0) +"/mystyle.css\">");
+            bw.write("<link rel=\"stylesheet\" type=\"text/css\" href=\"../mystyle.css\"");
             bw.write("</head> <body class = \"body\" >");
             bw.write("<br><div class = \"title\">" + name + "</font><font color = \"red\"> Report </div>");
             bw.write("<br><table class = \"table\">");
@@ -122,7 +122,7 @@ public class CommitersReport {
             
         	bw.write("<tr><th class = \"th\">Added</th><td class = \"td\">"+ total_add + "</td></tr>");
         	bw.write("<tr><th class = \"th\">Removed</th><td class = \"td\">"+ total_rmv + "</td></tr>");
-        	bw.write("<tr><th class = \"th\">Updated</th><td class = \"td\">"+ name + "</td></tr>");
+        	bw.write("<tr><th class = \"th\">Updated</th><td class = \"td\">"+ (total_add - total_rmv) + "</td></tr>");
             
             bw.write("</table>");
             bw.write("</body>");

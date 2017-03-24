@@ -21,9 +21,9 @@ public class MainReport {
             bw.write("<html>");
             bw.write("<head>");
             bw.write("<title> Exercise-1 </title>");
-            bw.write("<link rel=\"stylesheet\" type=\"text/css\" href=\"" +args[1] +"/mystyle.css\">");
+            bw.write("<link rel=\"stylesheet\" type=\"text/css\" href=\"mystyle.css\">");
             bw.write("</head> <body class = \"body\">");
-            bw.write("<br><div class = \"title\"> Report for  <a class = \"link\" href=\""+ args[0] +"\"> "+args[0].substring(args[0].lastIndexOf("\\")+1)+"</a> repository </div>");
+            bw.write("<br><div class = \"title\"> Report for  <a class = \"link\" href=\" https://github.com/taggelos/Software-Engineering\"> "+args[0].substring(args[0].lastIndexOf("\\")+1)+"</a> repository </div>");
             bw.write("<br><br><table class= \"table\">");
             
             MainReport obj = new MainReport();
@@ -197,7 +197,7 @@ public class MainReport {
          	BranchReport.create(paths, brnames.get(i), brcommits ,obj);
          	
     		bw.write("<tr>");
-    		bw.write("<td class = \"a\"><a class = \"link\" href="+paths.get(1)+"/branchReports/"+brnames.get(i)+".htm>" + brnames.get(i)+ "</a></td>");
+    		bw.write("<td class = \"a\"><a class = \"link\" href=\"branchReports/"+brnames.get(i)+".htm \">" + brnames.get(i)+ "</a></td>");
     	    		
     		if(brnames.get(i).equals("master")) {
     			command = "cmd /C git log master --date=format:%Y-%m-%d | grep Date: | tail -1";
@@ -251,7 +251,7 @@ public class MainReport {
          	
          	bw.write("<tr>");
          	
-         	bw.write("<td class = \"a\"><a class = \"link\" href="+paths.get(1)+"/userReports/"+name.replace(" ", "")+".htm>" + name + "</a></td>");
+         	bw.write("<td class = \"a\"><a class = \"link\" href=\"userReports/"+name.replace(" ", "")+".htm\">" + name + "</a></td>");
          	bw.write("<td class = \"td\">"+ s.split("\t")[0] +"</td>");
          	bw.write("<td class = \"td\">" + String.format("%.02f", Float.valueOf(s.split("\t")[0])*100/commits) + "%</td>");
          	bw.write("<tr>");	
