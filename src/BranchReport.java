@@ -1,6 +1,4 @@
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -107,7 +105,7 @@ public class BranchReport {
             	bw.write("<td class = \"td\">" + id.get(i) +" </td>"  );
             	bw.write("<td class = \"td\">" + msg.get(i) +" </td>"  );
             	bw.write("<td class = \"td\">" + date.get(i) +" </td>"  );
-            	bw.write("<td class = \"td\">" + author.get(i) +" </td>"  );
+            	bw.write("<td class = \"td\">" + author.get(i).split("<")[0] +" </td>"  );
             	bw.write("<td class = \"td\">" + line +" </td>"  );
             	bw.write("</tr>");
             }

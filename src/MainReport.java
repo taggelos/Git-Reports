@@ -33,18 +33,13 @@ public class MainReport {
             String output;
             
             
-            int commiters_count=0;
+            int committers_count=0;
             int commits=0;
             
             command = "cmd /C git ls-files | wc -l";
-
-            //in windows
-        	//System.getProperty("os.name").toLowerCase().startsWith("windows");
             
             output = obj.executeCommand(command, args[0]);
             
-            //System.out.println(System.getProperty("user.dir"));
-
             System.out.println("Number of files is: \n" +  output);
             bw.write("<tr><th class=\"th\">Number of files</th><td class = \"td\">"+ output+ "</td></tr>");
             
@@ -72,7 +67,7 @@ public class MainReport {
             output = obj.executeCommand(command, args[0]);
             System.out.println("Number of total committers is: \n" +  output);
             bw.write("<tr><th class=\"th\">Number of total committers</th><td class = \"td\">" + output+ "</td></tr>");
-            commiters_count = Integer.valueOf(output.substring(0, output.length()-1));
+            committers_count = Integer.valueOf(output.substring(0, output.length()-1));
           
             
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -83,13 +78,7 @@ public class MainReport {
             commits = Integer.valueOf(output.substring(0, output.length()-1));
             
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-            
-            //git shotlog -sn --all | cut -f 1  <---
-            //git shotlog -sn --all | cut -f 2
-
-            /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-            
-            List<String> commiters = new ArrayList<String>();
+                        
             List<String> paths = new ArrayList<String>();
             paths.add(args[0]);
             paths.add(args[1]);
@@ -97,7 +86,7 @@ public class MainReport {
             bw.write("</table><br>");
             List<String> brnames = createBranchTable(numBranches,bw, paths,commits, obj);
             
-            commiters =createCommitersTable(bw, paths,brnames, commiters_count, commits, obj);
+            createcommittersTable(bw, paths,brnames, committers_count, commits, obj);
             
             System.out.println("\n--------------------------------------");
             
@@ -226,17 +215,17 @@ public class MainReport {
     	return brnames;
     } 
     
-    private static List<String> createCommitersTable(BufferedWriter bw, List<String> paths,List<String> brnames, int commiters_count, int commits, MainReport obj) throws IOException, ParseException {
+    private static void createcommittersTable(BufferedWriter bw, List<String> paths,List<String> brnames, int committers_count, int commits, MainReport obj) throws IOException, ParseException {
     	String s,command,out;
        
         bw.write("<br><br>");
-	    bw.write("<div class = \"title\"> Commiters </div>");
+	    bw.write("<div class = \"title\"> Committers </div>");
     	bw.write("<br><br><table class = \"table\"");
     	bw.write("<tr><th class=\"th\">Name</th><th class=\"th\">Number of commits</th><th class=\"th\">Percentage of Commits</th></tr>");
     	
     	
-        List<String> commiters = new ArrayList<String>();
-        for (int i = 0; i < commiters_count; i++) {
+        List<String> committers = new ArrayList<String>();
+        for (int i = 0; i < committers_count; i++) {
          	command = "cmd /C git shortlog -sn --all";
          	out = obj.executeCommand(command, paths.get(0));
          	
@@ -246,11 +235,11 @@ public class MainReport {
          		s=s.replaceFirst(" ", "");
          	}
 
-         	commiters.add(s.split("\t")[1]);
+         	committers.add(s.split("\t")[1]);
          	
-         	String name =commiters.get(i);
+         	String name =committers.get(i);
          	
-         	CommitersReport.create(paths,brnames,name,obj );
+         	CommitterReport.create(paths,brnames,name,obj );
          	
          	bw.write("<tr>");
          	
@@ -260,7 +249,6 @@ public class MainReport {
          	bw.write("<tr>");	
         }
         bw.write("</table>");
-        return commiters;
     }
     
     

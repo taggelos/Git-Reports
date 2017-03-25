@@ -1,17 +1,13 @@
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
-public class CommitersReport {
+public class CommitterReport {
 
 
-    public static void create(List <String> paths, List<String> brname ,String name ,MainReport obj) throws ParseException {
+    public static void create(List <String> paths, List<String> brname ,String name,MainReport obj) throws ParseException {
 
         try {
         	File myDir = new File(paths.get(1) , "userReports");
@@ -45,6 +41,8 @@ public class CommitersReport {
             String command,output;
             String[] line;
 			int usercom=0;
+			int total_commits=0;
+			
             
             for (int i = 0; i < brname.size(); i++) {
 				bw.write("<tr>");
@@ -53,7 +51,7 @@ public class CommitersReport {
 	            output = obj.executeCommand(command, paths.get(0));
 	            //System.out.println("Number of total branch commits is: "+name +" \n" +  output);
 	            int commits = Integer.valueOf(output.substring(0, output.length()-1));
-	            
+	           
 	            
 	            command = "cmd /C git log "+brname.get(i) +" | grep Author:";
 	            output = obj.executeCommand(command, paths.get(0));
@@ -62,7 +60,7 @@ public class CommitersReport {
 	            	if(line[j].split("<")[0].contains(name))
 	                	usercom++;
 				}
-                
+	            if(brname.get(i).equals("master")) total_commits=usercom;
                 //System.out.println("USERCOM: "+ usercom + "name "+ name +" AXNEEE \n" +  output);
 	            
 	            bw.write("<td class = \"td\"> "+ brname.get(i) +"</td>");
@@ -107,11 +105,10 @@ public class CommitersReport {
         	//List<Integer> commits_per_day = new ArrayList<Integer>();
         	//List<Integer> commits_per_week = new ArrayList<Integer>();
         	//List<Integer> commits_per_month = new ArrayList<Integer>();
-        	int days=0, weeks=0, months=0;
+        	float days=0, weeks=0, months=0;
         	
         	
         	since = first_date;
-        	
         	while(since.compareTo(last_date) < 0) {
         		
         		days += 1;
@@ -121,40 +118,17 @@ public class CommitersReport {
             	since = dateFormat.format(cal.getTime());           
             	
         	}
-        	since = first_date;
-        	while(since.compareTo(last_date) < 0) {
-        		
-        		weeks += 1;
-        		cal.setTime( dateFormat.parse( since ) );
-            	 	
-            	cal.add( Calendar.DATE, 7 );
-            	since = dateFormat.format(cal.getTime());           
-            	
-        		
-        		/*cal.setTime( dateFormat.parse( since ) );
-            	since = dateFormat.format(cal.getTime());            	
-            	cal.add( Calendar.DATE, 1 );
-            	before = dateFormat.format(cal.getTime());            	
-            	command = "cmd /C git shortlog -sne --since=\""+ since +"\" --before=\""+ before +"\" --author=\"^"+name+"\" --all";
-        		System.out.println("command : "+command);
-            	output = obj.executeCommand(command, paths.get(0));
-            	System.out.println("DATE: " + since + " - " + before);
-            	System.out.println("DATE: " + output);
-            	since = before; */
-        	}
-        	since = first_date;
-        	while(since.compareTo(last_date) < 0) {
-        		months += 1;
-        		cal.setTime( dateFormat.parse( since ) );
-            	 	
-            	cal.add( Calendar.DATE, 30 );
-            	since = dateFormat.format(cal.getTime());     
-        	}
+        	weeks =(Float.valueOf(days)/7);
+        	months = (Float.valueOf(days)/30);
+        	if (weeks < 1) weeks=1;
+        	if (months < 1) months=1;
+        	
+        	
         	System.out.println("Days: " + days + " Weeks: " + weeks + " Months: " + months);
             
-        	bw.write("<tr><th class = \"th\">per Day</th><td class = \"td\">"+ name + "</td></tr>");
-        	bw.write("<tr><th class = \"th\">per Week</th><td class = \"td\">"+ name + "</td></tr>");
-        	bw.write("<tr><th class = \"th\">per Month</th><td class = \"td\">"+ name + "</td></tr>");
+        	bw.write("<tr><th class = \"th\">per Day</th><td class = \"td\">"+ String.format("%.02f",total_commits/days) + "</td></tr>");
+        	bw.write("<tr><th class = \"th\">per Week</th><td class = \"td\">"+ String.format("%.02f",total_commits/weeks) + "</td></tr>");
+        	bw.write("<tr><th class = \"th\">per Month</th><td class = \"td\">"+ String.format("%.02f",total_commits/months) + "</td></tr>");
         	
         	 /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         	
