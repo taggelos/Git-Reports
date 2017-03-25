@@ -1,13 +1,17 @@
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class CommitersReport {
 
 
-    public static void create(List <String> paths, List<String> brname ,String name ,MainReport obj) {
+    public static void create(List <String> paths, List<String> brname ,String name ,MainReport obj) throws ParseException {
 
         try {
         	File myDir = new File(paths.get(1) , "userReports");
@@ -47,7 +51,7 @@ public class CommitersReport {
 				
 				command = "cmd /C  git log "+ brname.get(i) +" --oneline | wc -l";
 	            output = obj.executeCommand(command, paths.get(0));
-	            System.out.println("Number of total branch commits is: "+name +" \n" +  output);
+	            //System.out.println("Number of total branch commits is: "+name +" \n" +  output);
 	            int commits = Integer.valueOf(output.substring(0, output.length()-1));
 	            
 	            
@@ -59,7 +63,7 @@ public class CommitersReport {
 	                	usercom++;
 				}
                 
-                System.out.println("USERCOM: "+ usercom + "name "+ name +" AXNEEE \n" +  output);
+                //System.out.println("USERCOM: "+ usercom + "name "+ name +" AXNEEE \n" +  output);
 	            
 	            bw.write("<td class = \"td\"> "+ brname.get(i) +"</td>");
 	            bw.write("<td class = \"td\"> "+ usercom +"</td>");
@@ -76,7 +80,77 @@ public class CommitersReport {
 
         	bw.write("<br><br><table class = \"table\">");
         	
+        	// git shortlog -sn --since="date" --author="^name"
         	
+        	String first_date, last_date, since;
+        	
+        	command = "cmd /C git log --date=format:%Y-%m-%d | grep Date | tail -1";
+        	first_date = obj.executeCommand(command, paths.get(0));
+        	
+        	first_date = first_date.replace("Date:", "").replaceAll(" ", "").replace("\n", "");
+        	
+        	command = "cmd /C git log --date=format:%Y-%m-%d | grep Date | head -n 1";
+        	last_date = obj.executeCommand(command, paths.get(0));
+        	
+        	last_date = last_date.replace("Date:", "").replaceAll(" ", "").replace("\n", "");
+        	
+        	SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        	Calendar cal = Calendar.getInstance();
+        	cal.setTime( dateFormat.parse( first_date ) );
+        	cal.add( Calendar.DATE, -1 );
+        	first_date = dateFormat.format(cal.getTime());
+        	//System.out.println("DATE: " + date);
+        	
+        	//command = "git shortlog -sne --since="01 Jan 2015" --before="01 Feb 2015"";
+        	//output = obj.executeCommand(command, paths.get(0));
+        	
+        	//List<Integer> commits_per_day = new ArrayList<Integer>();
+        	//List<Integer> commits_per_week = new ArrayList<Integer>();
+        	//List<Integer> commits_per_month = new ArrayList<Integer>();
+        	int days=0, weeks=0, months=0;
+        	
+        	
+        	since = first_date;
+        	
+        	while(since.compareTo(last_date) < 0) {
+        		
+        		days += 1;
+        		cal.setTime( dateFormat.parse( since ) );
+            	 	
+            	cal.add( Calendar.DATE, 1 );
+            	since = dateFormat.format(cal.getTime());           
+            	
+        	}
+        	since = first_date;
+        	while(since.compareTo(last_date) < 0) {
+        		
+        		weeks += 1;
+        		cal.setTime( dateFormat.parse( since ) );
+            	 	
+            	cal.add( Calendar.DATE, 7 );
+            	since = dateFormat.format(cal.getTime());           
+            	
+        		
+        		/*cal.setTime( dateFormat.parse( since ) );
+            	since = dateFormat.format(cal.getTime());            	
+            	cal.add( Calendar.DATE, 1 );
+            	before = dateFormat.format(cal.getTime());            	
+            	command = "cmd /C git shortlog -sne --since=\""+ since +"\" --before=\""+ before +"\" --author=\"^"+name+"\" --all";
+        		System.out.println("command : "+command);
+            	output = obj.executeCommand(command, paths.get(0));
+            	System.out.println("DATE: " + since + " - " + before);
+            	System.out.println("DATE: " + output);
+            	since = before; */
+        	}
+        	since = first_date;
+        	while(since.compareTo(last_date) < 0) {
+        		months += 1;
+        		cal.setTime( dateFormat.parse( since ) );
+            	 	
+            	cal.add( Calendar.DATE, 30 );
+            	since = dateFormat.format(cal.getTime());     
+        	}
+        	System.out.println("Days: " + days + " Weeks: " + weeks + " Months: " + months);
             
         	bw.write("<tr><th class = \"th\">per Day</th><td class = \"td\">"+ name + "</td></tr>");
         	bw.write("<tr><th class = \"th\">per Week</th><td class = \"td\">"+ name + "</td></tr>");
@@ -111,12 +185,12 @@ public class CommitersReport {
         	if(output.isEmpty()) {
         		output="0";
         	}
-        	System.out.println("OUT: "+ output);
+        	//System.out.println("OUT: "+ output);
         	output = output.replaceAll("-", "0");
         	int total_rmv=0;
         	line = output.split("\n");
         	for (int j = 0; j < line.length; j++) {
-        		System.out.println( "--->"+ line[j]);
+        		//System.out.println( "--->"+ line[j]);
         		total_rmv += Integer.valueOf(line[j]);
         	}
             

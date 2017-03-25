@@ -1,11 +1,12 @@
 import java.io.*;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainReport {
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ParseException {
 
         if (args[0] == null || args[0].trim().isEmpty() || args[1] == null || args[1].trim().isEmpty()) {
             System.out.println("You need to specify a path!");
@@ -148,13 +149,15 @@ public class MainReport {
             String line;
             while ((line = reader.readLine()) != null) {
                 output.append(line+'\n');
+                
             }
             p.waitFor();
             p.destroy();
+            
         } catch (Exception e) {
             e.printStackTrace();
         }
-        //.substring(0,output.length()-2)
+        //System.out.println(command+ "---->"+output);
         return output.toString();
     }
     
@@ -223,7 +226,7 @@ public class MainReport {
     	return brnames;
     } 
     
-    private static List<String> createCommitersTable(BufferedWriter bw, List<String> paths,List<String> brnames, int commiters_count, int commits, MainReport obj) throws IOException {
+    private static List<String> createCommitersTable(BufferedWriter bw, List<String> paths,List<String> brnames, int commiters_count, int commits, MainReport obj) throws IOException, ParseException {
     	String s,command,out;
        
         bw.write("<br><br>");

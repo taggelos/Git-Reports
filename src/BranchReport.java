@@ -103,7 +103,7 @@ public class BranchReport {
                 if(tag.get(i).length() != 0)
                 	line = line.substring(0, line.length()-2);
             	
-            	System.out.println("line:" + line + " id-> " + id.get(i) + " tag ->" + tag.get(i)+" \n");
+            	//System.out.println("line:" + line + " id-> " + id.get(i) + " tag ->" + tag.get(i)+" \n");
             	bw.write("<td class = \"td\">" + id.get(i) +" </td>"  );
             	bw.write("<td class = \"td\">" + msg.get(i) +" </td>"  );
             	bw.write("<td class = \"td\">" + date.get(i) +" </td>"  );
