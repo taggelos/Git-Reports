@@ -8,8 +8,8 @@ public class MainReport {
 
     public static void main(String[] args) throws ParseException {
 
-        if (args[0] == null || args[0].trim().isEmpty() || args[1] == null || args[1].trim().isEmpty()) {
-            System.out.println("You need to specify a path!");
+        if (args.length != 2) {
+            System.out.println("You need to specify the paths!");
             return;
         }
         
@@ -88,7 +88,7 @@ public class MainReport {
             
             createcommittersTable(bw, paths,brnames, committers_count, commits, obj);
             
-            System.out.println("\n--------------------------------------");
+            System.out.println("\n----------- Process Ended Successfully -----------");
             
             bw.write("<div class = \"text\"> <p>&copy; 2017 <p> </div>");
             bw.write("</body>");
@@ -132,7 +132,6 @@ public class MainReport {
         try {
             p = Runtime.getRuntime().exec(command, null, new File(path));
             
-            //System.out.println(p.exitValue());
             BufferedReader reader =
                     new BufferedReader(new InputStreamReader(p.getInputStream()));
             String line;
@@ -146,11 +145,8 @@ public class MainReport {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        //System.out.println(command+ "---->"+output);
         return output.toString();
     }
-    
-    //git for-each-ref --sort=committerdate --format=%(committerdate:iso8601)%09%(refname) refs/heads
     
     private static String totalLines(String out){
     	String[] parts = out.split("\n");
@@ -171,17 +167,17 @@ public class MainReport {
     	int brcommits;
     	
     	ArrayList<String> date = new ArrayList<>();
-    	ArrayList<String> auth = new ArrayList<>(); //TODO OR NOT TODO
     	ArrayList<String> brnames = new ArrayList<>();
     	for (int i=0; i<brnum;i++){
-    		command = "git for-each-ref --sort=-committerdate refs/heads/ --format=%(committerdate:short),%(authorname),%(refname:short)";
+    		command = "git for-each-ref --sort=-committerdate refs/heads/ --format=%(committerdate:short),%(refname:short)";
     		output = obj.executeCommand(command, paths.get(0));
     		output = output.split("\n")[i];
          	
          	date.add(output.split(",")[0]);
-         	auth.add(output.split(",")[1]);
-         	brnames.add(output.split(",")[2]);
+         	brnames.add(output.split(",")[1]);
+    	}
          	
+    	for (int i=0; i<brnum;i++){
          	command = "cmd /C  git log "+brnames.get(i)+" --oneline | wc -l";
             output = obj.executeCommand(command, paths.get(0));
             brcommits = Integer.valueOf(output.substring(0, output.length()-1));
@@ -190,12 +186,14 @@ public class MainReport {
          	
     		bw.write("<tr>");
     		bw.write("<td class = \"a\"><a class = \"link\" href=\"branchReports/"+brnames.get(i)+".htm \">" + brnames.get(i)+ "</a></td>");
-    	    		
+    	    	
+    		String next="";
+    		if(i+1 < brnum) next = brnames.get(i+1)+"...";
     		if(brnames.get(i).equals("master")) {
     			command = "cmd /C git log master --date=format:%Y-%m-%d | grep Date: | tail -1";
     		}
     		else {
-    			command = "cmd /C git log master..."+brnames.get(i)+" --date=format:%Y-%m-%d | grep Date: | tail -1";
+    			command = "cmd /C git log "+next+brnames.get(i)+" --date=format:%Y-%m-%d | grep Date: | tail -1";
     		}
     		
     		output = obj.executeCommand(command, paths.get(0));
