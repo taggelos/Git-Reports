@@ -30,7 +30,7 @@ public class MainReport {
             MainReport obj = new MainReport();
 
             String command;
-            List <String> output,lineoutput;
+            List <String> output;
             
             
             int committers_count=0;
@@ -46,9 +46,8 @@ public class MainReport {
             command = "cmd /C git ls-files";
             output = obj.executeCommand(command, args[0]);
             for (int i = 0; i < output.size(); i++) {
-            	command = "cmd /C wc -l "+ output.get(i);
-                lineoutput = obj.executeCommand(command, args[0]);
-                sum_lines += Integer.valueOf(lineoutput.get(0).split(" ")[0]);
+            	countLines(output.get(i));
+                sum_lines += countLines(output.get(i));
 			}
 
             System.out.println("Number of total lines is: \n" +  sum_lines+ "\n") ;
@@ -147,6 +146,27 @@ public class MainReport {
         }
         return output;
     }
+	
+	public static int countLines(String filename) throws IOException {
+	    InputStream is = new BufferedInputStream(new FileInputStream(filename));
+	    try {
+	        byte[] c = new byte[1024];
+	        int count = 0;
+	        int readChars = 0;
+	        boolean empty = true;
+	        while ((readChars = is.read(c)) != -1) {
+	            empty = false;
+	            for (int i = 0; i < readChars; ++i) {
+	                if (c[i] == '\n') {
+	                    ++count;
+	                }
+	            }
+	        }
+	        return (count == 0 && !empty) ? 1 : count;
+	    } finally {
+	        is.close();
+	    }
+	}
         
     private static List<String> createBranchTable(int brnum, BufferedWriter bw, List<String> paths ,int commits, MainReport obj) throws IOException{
 	    bw.write("<br><br>");
@@ -250,6 +270,29 @@ public class MainReport {
          	bw.write("<td class = \"td\">" + String.format("%.02f", Float.valueOf(s.split("\t")[0])*100/commits) + "%</td>");
          	bw.write("<tr>");	
         }
+        bw.write("</table>");
+        
+        
+        bw.write("<br><br><br>");
+	    bw.write("<div class = \"title\"> Avg Lines Per Committer</div>");
+    	bw.write("<br><br><table class = \"table\"");
+    	
+        Integer total_add=0, total_rmv=0;
+        command = "cmd /C git log  --pretty=tformat: --numstat";
+        output = obj.executeCommand(command, paths.get(0));
+    	
+        String line;
+        for (int i = 0; i < output.size(); i++) {
+        	line = output.get(i).replaceAll("-", "0");
+        	
+        	total_add += Integer.valueOf(line.split("\t")[0]);
+        	total_rmv += Integer.valueOf(line.split("\t")[1]);
+		}
+    	
+        bw.write("<tr><th class=\"th\">Lines Added</th><td class = \"td\">"+ (total_add/committers_count)+ "</td></tr>");
+        bw.write("<tr><th class=\"th\">Lines Removed</th><td class = \"td\">"+ (total_rmv/committers_count)+ "</td></tr>");
+        bw.write("<tr><th class=\"th\">Lines Updated</th><td class = \"td\">"+ (Math.abs(total_add-total_rmv)/committers_count)+ "</td></tr>");
+        
         bw.write("</table>");
     }   
 }

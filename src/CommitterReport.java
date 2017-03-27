@@ -56,12 +56,16 @@ public class CommitterReport {
 	            output = obj.executeCommand(command, paths.get(0));
 	            int commits = Integer.valueOf(output.size());
 	            
-	            command = "cmd /C git log "+brname.get(i) +" | grep Author:";
+	            command = "cmd /C git log "+brname.get(i);
 	            output = obj.executeCommand(command, paths.get(0));
+	            
 	            for (int j = 0; j < output.size(); j++) {
-	            	if(output.get(j).split("<")[0].contains(name))
-	                	usercom++;
+					if(output.get(j).contains("Author: ")){
+						if(output.get(j).contains(name))
+		                	usercom++;
+					}
 				}
+	            
 	            
 	            if(brname.get(i).equals("master")) total_commits=usercom;
 	            
@@ -125,31 +129,17 @@ public class CommitterReport {
             bw.write("<div class = \"title\"> Average Lines </div>");
         	bw.write("<br><br><table class = \"table\">");
         	
-        	command = "cmd /C git log --author=\""+name +"\" --pretty=tformat: --numstat | cut -f 1";
-        	output = obj.executeCommand(command, paths.get(0));
+        	command = "cmd /C git log --author=\""+name +"\" --pretty=tformat: --numstat";
+            output = obj.executeCommand(command, paths.get(0));
         	
-        	/*if(output.isEmpty()) {
-        		out="0";
-        	}*/
-        	int total_add=0;
-        	
-        	for (int j = 0; j < output.size(); j++) {
-        		line = output.get(j).replace("-", "0");
-        		total_add += Integer.valueOf(line);
-        	}
-        	
-        	command = "cmd /C git log --author=\""+name +"\" --pretty=tformat: --numstat | cut -f 2";
-        	output = obj.executeCommand(command, paths.get(0));
-        	
-        	/*if(output.isEmpty()) {
-    		out="0";
-    		}*/
-        	
-        	int total_rmv=0;
-        	for (int j = 0; j < output.size(); j++) {
-        		line = output.get(j).replace("-", "0");
-        		total_rmv += Integer.valueOf(line);
-        	}
+            int total_add = 0;
+			int total_rmv = 0;
+			for (int i = 0; i < output.size(); i++) {
+            	line = output.get(i).replaceAll("-", "0");
+            	
+            	total_add += Integer.valueOf(line.split("\t")[0]);
+            	total_rmv += Integer.valueOf(line.split("\t")[1]);
+    		}
             
         	bw.write("<tr><th class = \"th\">Added</th><td class = \"td\">"+ total_add + "</td></tr>");
         	bw.write("<tr><th class = \"th\">Removed</th><td class = \"td\">"+ total_rmv + "</td></tr>");
