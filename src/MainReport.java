@@ -30,54 +30,59 @@ public class MainReport {
             MainReport obj = new MainReport();
 
             String command;
-            String output;
+            List <String> output,lineoutput;
             
             
             int committers_count=0;
-            int commits=0;
+            int commits=0,sum_lines=0;
             
-            command = "cmd /C git ls-files | wc -l";
+            command = "cmd /C git ls-files";
             
             output = obj.executeCommand(command, args[0]);
             
-            System.out.println("Number of files is: \n" +  output);
-            bw.write("<tr><th class=\"th\">Number of files</th><td class = \"td\">"+ output+ "</td></tr>");
+            System.out.println("Number of files is: \n" +  output.size());
+            bw.write("<tr><th class=\"th\">Number of files</th><td class = \"td\">"+ output.size()+ "</td></tr>");
             
-            
-            command = "cmd /C git ls-files | xargs wc -l | tail -1";
+            command = "cmd /C git ls-files";
             output = obj.executeCommand(command, args[0]);
-            System.out.println("Number of total lines is: \n" +  totalLines(output)+ "\n") ;
-            bw.write("<tr><th class=\"th\">Number of total lines</th><td class = \"td\">" + totalLines(output)+ "</td></tr>");
+            for (int i = 0; i < output.size(); i++) {
+            	command = "cmd /C wc -l "+ output.get(i);
+                lineoutput = obj.executeCommand(command, args[0]);
+                sum_lines += Integer.valueOf(lineoutput.get(0).split(" ")[0]);
+			}
+
+            System.out.println("Number of total lines is: \n" +  sum_lines+ "\n") ;
+            bw.write("<tr><th class=\"th\">Number of total lines</th><td class = \"td\">" + sum_lines + "</td></tr>");
             
-            /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-            command = "cmd /C git branch | wc -l";
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            command = "cmd /C git branch";
             output = obj.executeCommand(command, args[0]);
-            int numBranches = Integer.parseInt(output.replace("\n", ""));
+            int numBranches = output.size();
             System.out.println("Number of total branches is: \n" +  numBranches);
             bw.write("<tr><th class=\"th\">Number of total branches</th><td class = \"td\">" + numBranches+ "</td></tr>");
             
-            /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-            command = "cmd /C git tag | wc -l";
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            command = "cmd /C git tag";
             output = obj.executeCommand(command, args[0]);
-            System.out.println("Number of total tags is: \n" +  output);
-            bw.write("<tr><th class=\"th\">Number of total tags</th><td class = \"td\">" + output+ "</td></tr>");
+            System.out.println("Number of total tags is: \n" +  output.size());
+            bw.write("<tr><th class=\"th\">Number of total tags</th><td class = \"td\">" + output.size()+ "</td></tr>");
             
-            /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-            command = "cmd /C git shortlog -sn --all | wc -l";
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            command = "cmd /C git shortlog -sn --all";
             output = obj.executeCommand(command, args[0]);
-            System.out.println("Number of total committers is: \n" +  output);
-            bw.write("<tr><th class=\"th\">Number of total committers</th><td class = \"td\">" + output+ "</td></tr>");
-            committers_count = Integer.valueOf(output.substring(0, output.length()-1));
+            System.out.println("Number of total committers is: \n" +  output.size());
+            bw.write("<tr><th class=\"th\">Number of total committers</th><td class = \"td\">" + output.size()+ "</td></tr>");
+            committers_count = output.size();
           
             
-            /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-            command = "cmd /C  git log | findstr Author: | sort | wc -l";
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            command = "cmd /C  git rev-list --all --count";
             output = obj.executeCommand(command, args[0]);
-            System.out.println("Number of total commits is: \n" +  output);
-            bw.write("<tr><th class=\"th\">Number of total commits</th><td class = \"td\">" + output+ "</td></tr>");
-            commits = Integer.valueOf(output.substring(0, output.length()-1));
+            System.out.println("Number of total commits is: \n" +  output.get(0));
+            bw.write("<tr><th class=\"th\">Number of total commits</th><td class = \"td\">" +  output.get(0)+ "</td></tr>");
+            commits = Integer.valueOf(output.get(0));
             
-            /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+            //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                         
             List<String> paths = new ArrayList<String>();
             paths.add(args[0]);
@@ -100,9 +105,7 @@ public class MainReport {
         }
 
     }
-
-    
-    
+  
     
     private static void CreateCssFile(String path) throws IOException {
     	File f = new File(path + "/mystyle.css");
@@ -124,10 +127,8 @@ public class MainReport {
 	}
 
 
-	public String executeCommand(String command, String path) {
-
-        StringBuilder output = new StringBuilder();
-
+	public List <String> executeCommand(String command, String path) {
+        List <String> output = new ArrayList<>();
         Process p;
         try {
             p = Runtime.getRuntime().exec(command, null, new File(path));
@@ -136,8 +137,7 @@ public class MainReport {
                     new BufferedReader(new InputStreamReader(p.getInputStream()));
             String line;
             while ((line = reader.readLine()) != null) {
-                output.append(line+'\n');
-                
+            	output.add(line);        
             }
             p.waitFor();
             p.destroy();
@@ -145,42 +145,35 @@ public class MainReport {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return output.toString();
+        return output;
     }
-    
-    private static String totalLines(String out){
-    	String[] parts = out.split("\n");
-    	//remove the word total
-    	out = parts[parts.length-1].replace("total" , ""); 
-    	//remove whitespaces from beginning
-    	parts = out.split("\\s+");   
-		return parts[1];
-    }
-    
+        
     private static List<String> createBranchTable(int brnum, BufferedWriter bw, List<String> paths ,int commits, MainReport obj) throws IOException{
 	    bw.write("<br><br>");
 	    bw.write("<div class = \"title\"> Branches </div>");
     	bw.write("<br><br><table class = \"table\"");
     	bw.write("<tr><th class=\"th\">Name</th><th class=\"th\">Date of Creation</th><th class=\"th\" >Last Date of Modification</th><th class=\"th\">Percentage of Commits</th></tr>");
     	
-    	String command, output;
+    	String command,out,line;
+    	List <String>output;
     	int brcommits;
     	
     	ArrayList<String> date = new ArrayList<>();
+    	ArrayList<String> adate = new ArrayList<>();
     	ArrayList<String> brnames = new ArrayList<>();
     	for (int i=0; i<brnum;i++){
     		command = "git for-each-ref --sort=-committerdate refs/heads/ --format=%(committerdate:short),%(refname:short)";
     		output = obj.executeCommand(command, paths.get(0));
-    		output = output.split("\n")[i];
+    		out = output.get(i);
          	
-         	date.add(output.split(",")[0]);
-         	brnames.add(output.split(",")[1]);
+         	date.add(out.split(",")[0]);
+         	brnames.add(out.split(",")[1]);
     	}
          	
     	for (int i=0; i<brnum;i++){
-         	command = "cmd /C  git log "+brnames.get(i)+" --oneline | wc -l";
+         	command = "cmd /C  git log "+brnames.get(i)+" --oneline";
             output = obj.executeCommand(command, paths.get(0));
-            brcommits = Integer.valueOf(output.substring(0, output.length()-1));
+            brcommits = Integer.valueOf(output.size());
             
          	BranchReport.create(paths, brnames.get(i), brcommits ,obj);
          	
@@ -190,20 +183,29 @@ public class MainReport {
     		String next="";
     		if(i+1 < brnum) next = brnames.get(i+1)+"...";
     		if(brnames.get(i).equals("master")) {
-    			command = "cmd /C git log master --date=format:%Y-%m-%d | grep Date: | tail -1";
+    			command = "cmd /C git log master --date=format:%Y-%m-%d"; //| grep Date: | tail -1";
+    			
     		}
     		else {
-    			command = "cmd /C git log "+next+brnames.get(i)+" --date=format:%Y-%m-%d | grep Date: | tail -1";
+    			command = "cmd /C git log "+next+brnames.get(i)+" --date=format:%Y-%m-%d"; // | grep Date: | tail -1";
     		}
     		
     		output = obj.executeCommand(command, paths.get(0));
+    		if(output.isEmpty()){
+    			System.out.println("No commits in branch" + brnames.get(i));
+
+    		}
     		
-    		output = output.replace("Date:", "");
-    		output = output.replaceAll(" ", "");
+    		for (int j = 0; j < output.size(); j++) {
+				if(output.get(j).contains("Date: ")){
+					line = output.get(j).replace(" ", "");
+					adate.add(line.split(":")[1]);
+				}
+			}
     		
-    		bw.write("<td class = \"td\">"+output+"</td>");  
+    		bw.write("<td class = \"td\">"+ adate.get(adate.size()-1) +"</td>");  
     		
-    		bw.write("<td class = \"td\">"+date.get(i)+"</td>");
+    		bw.write("<td class = \"td\">"+ date.get(i) +"</td>");
     		
     		bw.write("<td class = \"td\">"+String.format("%.02f", Float.valueOf(brcommits)*100/commits)+"%</td>");
 
@@ -213,22 +215,24 @@ public class MainReport {
     	return brnames;
     } 
     
+    
     private static void createcommittersTable(BufferedWriter bw, List<String> paths,List<String> brnames, int committers_count, int commits, MainReport obj) throws IOException, ParseException {
-    	String s,command,out;
+    	String s,command;
+    	List<String> output;
        
         bw.write("<br><br>");
 	    bw.write("<div class = \"title\"> Committers </div>");
     	bw.write("<br><br><table class = \"table\"");
     	bw.write("<tr><th class=\"th\">Name</th><th class=\"th\">Number of commits</th><th class=\"th\">Percentage of Commits</th></tr>");
     	
-    	
+
+     	command = "cmd /C git shortlog -sn --all";
+     	output = obj.executeCommand(command, paths.get(0));
+     	
         List<String> committers = new ArrayList<String>();
-        for (int i = 0; i < committers_count; i++) {
-         	command = "cmd /C git shortlog -sn --all";
-         	out = obj.executeCommand(command, paths.get(0));
-         	
+        for (int i = 0; i < committers_count; i++) {        	
             
-         	s = out.split("\n")[i];
+         	s = output.get(i);
          	while(s.startsWith(" ")){
          		s=s.replaceFirst(" ", "");
          	}
@@ -247,7 +251,5 @@ public class MainReport {
          	bw.write("<tr>");	
         }
         bw.write("</table>");
-    }
-    
-    
+    }   
 }
