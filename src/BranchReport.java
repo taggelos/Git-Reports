@@ -4,7 +4,6 @@ import java.util.List;
 
 public class BranchReport {
 
-
     public static void create(List <String> paths, String name, int commits ,MainReport obj) {
 
         try {
@@ -67,7 +66,6 @@ public class BranchReport {
             	msg.add(line.split(" ", 2)[1]);           	
             	
             	// date
-            	
             	for (int j = 0; j < outputdate.size(); j++) {
 					if(outputdate.get(j).contains("Date: ")){
 						line = outputdate.get(j).replace(" ", "");
@@ -112,8 +110,8 @@ public class BranchReport {
             bw.write("</html>");
 
             bw.close();
-        } catch (IOException ignored) {
-
+        } catch (IOException e) {
+        	e.printStackTrace();
         }
 
     }

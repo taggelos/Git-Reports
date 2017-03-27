@@ -5,7 +5,6 @@ import java.util.List;
 
 public class MainReport {
 
-
     public static void main(String[] args) throws ParseException {
 
         if (args.length != 2) {
@@ -32,7 +31,6 @@ public class MainReport {
             String command;
             List <String> output;
             
-            
             int committers_count=0;
             int commits=0,sum_lines=0;
             
@@ -46,8 +44,7 @@ public class MainReport {
             command = "cmd /C git ls-files";
             output = obj.executeCommand(command, args[0]);
             for (int i = 0; i < output.size(); i++) {
-            	countLines(output.get(i));
-                sum_lines += countLines(output.get(i));
+                sum_lines += countLines(args[0]+"\\"+output.get(i));
 			}
 
             System.out.println("Number of total lines is: \n" +  sum_lines+ "\n") ;
@@ -121,7 +118,7 @@ public class MainReport {
         bw.write(".link:link {text-decoration: none;}");
         bw.write(".link:hover {text-decoration: underline;}");
         bw.write(".link:active {text-decoration: underline;}");
-        bw.write(".text{position: absolute; bottom: 0; right: 0; width: 100px; text-align:center;color: #555555 ; font-style: bold;}");
+        bw.write(".text{position: relative; bottom: 0; right: 0; width: 100px; text-align:center;color: #555555 ; font-style: bold;}");
         bw.close();
 	}
 
@@ -203,11 +200,10 @@ public class MainReport {
     		String next="";
     		if(i+1 < brnum) next = brnames.get(i+1)+"...";
     		if(brnames.get(i).equals("master")) {
-    			command = "cmd /C git log master --date=format:%Y-%m-%d"; //| grep Date: | tail -1";
-    			
+    			command = "cmd /C git log master --date=format:%Y-%m-%d";
     		}
     		else {
-    			command = "cmd /C git log "+next+brnames.get(i)+" --date=format:%Y-%m-%d"; // | grep Date: | tail -1";
+    			command = "cmd /C git log "+next+brnames.get(i)+" --date=format:%Y-%m-%d";
     		}
     		
     		output = obj.executeCommand(command, paths.get(0));
@@ -295,4 +291,5 @@ public class MainReport {
         
         bw.write("</table>");
     }   
+    
 }

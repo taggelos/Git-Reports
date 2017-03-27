@@ -150,8 +150,8 @@ public class CommitterReport {
             bw.write("</html>");
 
             bw.close();
-        } catch (IOException ignored) {
-        	ignored.printStackTrace();
+        } catch (IOException e) {
+        	e.printStackTrace();
         }
 
     }    
